@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="BetterCommandService" Version="1.0.2" />
     <PackageReference Include="Discord.NET" Version="2.2.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
   </ItemGroup>
 
 </Project>

@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using BetterCommandService;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DMCG_Answer.modules;
-using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 
 namespace DMCG_Answer
@@ -20,15 +13,13 @@ namespace DMCG_Answer
 
     class Program
     {
-        bool isHeistOn = false;
-        IEmote YourEmoji = new Emoji("🏦");
         IEmote Dealdone = new Emoji("🇩");
         IEmote tick = new Emoji("✅");
-        List<string> heist = new List<string>();
-        string against = "";
 
         public static void Main(string[] args)
-           => new Program().MainAsync().GetAwaiter().GetResult();
+        {
+            new Program().MainAsync().GetAwaiter().GetResult();
+        }
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
@@ -47,7 +38,6 @@ namespace DMCG_Answer
             //{
             //    Console.WriteLine(db);
             //}
-            Console.Write(typeof(string).Assembly.ImageRuntimeVersion);
 
             _client = new DiscordSocketClient();
 
@@ -57,13 +47,14 @@ namespace DMCG_Answer
 
             _client.ReactionAdded += HandleReactionAsync;
 
-
+            _client.JoinedGuild += HandleJoinAsync;
 
 
 
             //  You can assign your bot token to a string, and pass that in to connect.
             //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
-            var token = "NzIyNzMyMjM5Mzc2NjEzNDA2.Xuol1A.IVpfmEyG1JXIl_rucGGZ7xvwB2k";
+            var token = "NzIyNzMyMjM5Mzc2NjEzNDA2.XuuhMQ.9YeszxS1VUXSxaeGWRgynQnVbck" +
+                "";
 
             // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
             // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
@@ -72,12 +63,25 @@ namespace DMCG_Answer
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
-            await _client.SetGameAsync("Trading stuff",null,ActivityType.CustomStatus);
+            await _client.SetGameAsync("!trade help",null,ActivityType.Playing);
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
+        internal async Task HandleJoinAsync(SocketGuild guild) {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Color = Color.Purple;
+            embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
+            embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
+            var chn = guild.SystemChannel as SocketTextChannel;
+            if (guild.SystemChannel == null) {
+                chn = guild.DefaultChannel; 
+            }
+            if (chn == null) { chn = guild.TextChannels.First(); }
+            if (!guild.TextChannels.Any()) return;
+            await chn.SendMessageAsync("", false, embed.Build());
 
+        }
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
         {
             //string logMsg = "";
@@ -133,8 +137,6 @@ namespace DMCG_Answer
             {
                 if (msg == null) return;
                 if (msg.Channel.GetType() == typeof(SocketDMChannel)) {
-                    await msg.Channel.SendMessageAsync("I really don't like working through DMs....So if you may, use me in a server mate!\nIf you have a suggestion, use !suggest to DM the devs!");
-                    await Task.Delay(2000);
                     return; 
                 }
                 //var ca = msg.Content.ToCharArray();
@@ -155,6 +157,12 @@ namespace DMCG_Answer
 
                     else Console.WriteLine("User is bot");
                 }
+                else if (msg.ToString().Contains("show me da guildz"))
+                {
+                    var res = int.TryParse(msg.ToString()[0].ToString(), out int resultant);
+                    if (!res) return;
+                    await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name);
+                }
             }
             catch (Exception e)
             {
@@ -165,6 +173,7 @@ namespace DMCG_Answer
         }
         public async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
+            if (arg3 == null) return; 
             Console.WriteLine("Run HRA");
             var msg = await arg1.GetOrDownloadAsync();
             var mBed = msg.Embeds.First();
