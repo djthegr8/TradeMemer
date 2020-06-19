@@ -93,7 +93,7 @@ namespace DMCG_Answer.modules
             var sug = Context.Message.Content.Remove(0,5);
             var mBed = new EmbedBuilder();
             mBed.Description = sug + "\n" + $"*Given by {Context.User.Username}#{Context.User.Discriminator}*";
-            mBed.Title = $"**New bot suggestion from ** server {Context.Guild.Name}";
+            mBed.Title = $"**New bot suggestion from **{Context.Guild.Name}";
             var DMCG = (await Context.Client.GetGuildAsync(591660163229024287));
             var DJ = await DMCG.GetUserAsync(701029647760097361);
             var Ket = await DMCG.GetUserAsync(541998151716962305);
