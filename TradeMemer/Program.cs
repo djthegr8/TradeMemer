@@ -7,6 +7,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DMCG_Answer.modules;
 using System.Text.RegularExpressions;
+using System.Threading;
+using Microsoft.VisualBasic;
 
 namespace DMCG_Answer
 {
@@ -68,22 +70,36 @@ namespace DMCG_Answer
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         internal async Task HandleJoinAsync(SocketGuild guild) {
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.Color = Color.Purple;
-            embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
-            embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
-            var chn = guild.SystemChannel as SocketTextChannel;
-            if (guild.SystemChannel == null) {
-                chn = guild.DefaultChannel; 
-            }
-            if (chn == null) { chn = guild.TextChannels.First(); }
-            if (!guild.TextChannels.Any()) return;
-            await chn.SendMessageAsync("", false, embed.Build());
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+             new Thread(async () => {
+                var ownerMbed = new EmbedBuilder();
+                ownerMbed.Title = "Permissions required for Trade Memer";
+                ownerMbed.Description = "`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*";
+                ownerMbed.Color = Color.Red;
+                await guild.Owner.SendMessageAsync("", false, ownerMbed.Build());
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Color = Color.Purple;
+                embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
+                embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
+                var chn = guild.SystemChannel as SocketTextChannel;
+                if (guild.SystemChannel == null)
+                {
+                    chn = guild.DefaultChannel;
+                }
+                if (chn == null) { chn = guild.TextChannels.First(); }
+                if (!guild.TextChannels.Any()) return;
+                await chn.SendMessageAsync("", false, embed.Build());
+            }).Start();
+            
 
         }
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
+
             //string logMsg = "";
             //logMsg += $"[UTC TIME - {DateTime.UtcNow.ToLongDateString() + " : " + DateTime.UtcNow.ToLongTimeString()}] ";
             string completed = resultformat(result.IsSuccess);
@@ -110,14 +126,16 @@ namespace DMCG_Answer
             //}
             if (result.IsSuccess)
             {
-                EmbedBuilder eb = new EmbedBuilder();
-                eb.Color = Color.Green;
-                eb.Title = "**Command Log**";
-                eb.Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}";
-                eb.Footer = new EmbedFooterBuilder();
-                eb.Footer.Text = "Command Autogen";
-                eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
-                await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
+                new Thread(async () => {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.Color = Color.Green;
+                    eb.Title = "**Command Log**";
+                    eb.Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}";
+                    eb.Footer = new EmbedFooterBuilder();
+                    eb.Footer.Text = "Command Autogen";
+                    eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
+                    await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
+                }).Start();  
             }
 
         }
@@ -173,40 +191,46 @@ namespace DMCG_Answer
         }
         public async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
-            if (arg3 == null) return; 
-            Console.WriteLine("Run HRA");
             var msg = await arg1.GetOrDownloadAsync();
+            if (arg3 == null || !msg.Embeds.Any()) return;
+            //Console.WriteLine("Run HRA");
+            
             var mBed = msg.Embeds.First();
-            Console.WriteLine("Embed success");
-            Console.WriteLine(arg3.Emote.Name);
+            //Console.WriteLine("Embed success");
+            //Console.WriteLine(arg3.Emote.Name);
             if (arg2.Name == "marketplace" && mBed.Color == Color.Green)
             {
-                var userSellerStr = Regex.Match(mBed.Description, @"\d+").Value;
-                ulong userIdSeller = ulong.Parse(userSellerStr);
-                var userSeller = await arg2.GetUserAsync(userIdSeller);
-                var userIDReacter = arg3.UserId;
-                var userReacter = await arg2.GetUserAsync(userIDReacter);
-                if (userReacter.IsBot) return;
-                if (userSeller.Id == userReacter.Id && arg3.Emote.Name == Dealdone.Name)
+                new Thread(async () =>
                 {
-                    await msg.DeleteAsync();
-                    return;
-                }
-                Console.WriteLine("First if passed");
-                if (arg3.Emote.Name == tick.Name)
-                {
-                    Console.WriteLine("Second if passed");
-                    var DMCReacter = await userReacter.GetOrCreateDMChannelAsync();
-                    var DMCSeller = await userSeller.GetOrCreateDMChannelAsync();
-                    await DMCReacter.SendMessageAsync($"You have accepted a sale and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
-                    await DMCSeller.SendMessageAsync($"{userReacter} has accepted your deal! Contact them for finalizing.");
-                    await Task.Delay(5000);
-                }
-                else
-                {
-                    await msg.RemoveReactionAsync(arg3.Emote, userReacter);
-                }
+                    var userSellerStr = Regex.Match(mBed.Description, @"\d+").Value;
+                    ulong userIdSeller = ulong.Parse(userSellerStr);
+                    var userSeller = await arg2.GetUserAsync(userIdSeller);
+                    var userIDReacter = arg3.UserId;
+                    var userReacter = await arg2.GetUserAsync(userIDReacter);
+                    if (userReacter.IsBot) return;
+                    if (userSeller.Id == userReacter.Id && arg3.Emote.Name == Dealdone.Name)
+                    {
+                        await msg.DeleteAsync();
+                        return;
+                    }
+                    Console.WriteLine("First if passed");
+                    if (arg3.Emote.Name == tick.Name)
+                    {
+                        Console.WriteLine("Second if passed");
+                        var DMCReacter = await userReacter.GetOrCreateDMChannelAsync();
+                        var DMCSeller = await userSeller.GetOrCreateDMChannelAsync();
+                        await DMCReacter.SendMessageAsync($"You have accepted a sale and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
+                        await DMCSeller.SendMessageAsync($"{userReacter} has accepted your deal! Contact them for finalizing.");
+                        await Task.Delay(5000);
+                    }
+                    else
+                    {
+                        await msg.RemoveReactionAsync(arg3.Emote, userReacter);
+                    }
+
+                }).Start();
             }
+            
         }
 
     }
