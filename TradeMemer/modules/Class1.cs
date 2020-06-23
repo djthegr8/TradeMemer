@@ -14,7 +14,6 @@ namespace DMCG_Answer.modules
         [DiscordCommand("trade")]
         public async Task TradeCommand(int quantity, string item, int price)
         {
-
             if (quantity == 0 || price == 0 || item == "")
             {
                 EmbedBuilder errorEmbed = new EmbedBuilder();
@@ -39,7 +38,6 @@ namespace DMCG_Answer.modules
                 {
                     await truContext.Channel.SendMessageAsync("I dont have perms to make a channel. If u have trust issues, then create a channel called marketplace.");
                 }
-
             }
             ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower() == "marketplace").Id;
             EmbedBuilder eb = new EmbedBuilder();
@@ -52,8 +50,6 @@ namespace DMCG_Answer.modules
             string s;
             if (quantity > 1) { s = "s"; } else { s = ""; }
             await ReplyAsync($"Your sale of {quantity} {item}{s} for {price} currency has been mentioned in {chnl.Mention}!");
-
-
         }
         [DiscordCommand("trade")]
         public async Task SingleArgTrade(string help)
@@ -63,6 +59,7 @@ namespace DMCG_Answer.modules
             errorEmbed.Description = "``!trade`` \n``!trade [quantity] [item name] [price]``\nReact with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :regional_indicator_d: to declare the deal as closed.\n\n``!idea``\nHave a suggesion for the bot? Tell it here!!!\n\n``!vote``\n Gives the link for bot's site\n\n``!ping``\nGets the ping of the bot";
             var weird = await Context.Channel.SendMessageAsync("", false, errorEmbed.Build());
         }
+
         [DiscordCommand("ping")]
         public async Task Ping()
         {
@@ -100,8 +97,6 @@ namespace DMCG_Answer.modules
             await DJ.SendMessageAsync("",false, mBed.Build());
             await Ket.SendMessageAsync("",false, mBed.Build());
             await Task.Delay(2000);
-            
         }
-
     }
 }

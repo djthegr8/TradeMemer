@@ -9,10 +9,10 @@ using DMCG_Answer.modules;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.VisualBasic;
+using Discord.Net;
 
 namespace DMCG_Answer
-{
-
+{ 
     class Program
     {
         IEmote Dealdone = new Emoji("🇩");
@@ -34,13 +34,11 @@ namespace DMCG_Answer
         });
         public async Task MainAsync()
         {
-
             //Console.WriteLine("The list of databases on this server is: ");
             //foreach (var db in dbList)
             //{
             //    Console.WriteLine(db);
             //}
-
             _client = new DiscordSocketClient();
 
             _client.Log += Log;
@@ -50,9 +48,6 @@ namespace DMCG_Answer
             _client.ReactionAdded += HandleReactionAsync;
 
             _client.JoinedGuild += HandleJoinAsync;
-
-
-
             //  You can assign your bot token to a string, and pass that in to connect.
             //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
             var token = "NzIyNzMyMjM5Mzc2NjEzNDA2.XuuhMQ.9YeszxS1VUXSxaeGWRgynQnVbck" +
@@ -72,34 +67,38 @@ namespace DMCG_Answer
         }
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         internal async Task HandleJoinAsync(SocketGuild guild) {
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
              new Thread(async () => {
-                var ownerMbed = new EmbedBuilder();
-                ownerMbed.Title = "Permissions required for Trade Memer";
-                ownerMbed.Description = "`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*";
-                ownerMbed.Color = Color.Red;
-                await guild.Owner.SendMessageAsync("", false, ownerMbed.Build());
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.Color = Color.Purple;
-                embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
-                embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
-                var chn = guild.SystemChannel as SocketTextChannel;
-                if (guild.SystemChannel == null)
-                {
-                    chn = guild.DefaultChannel;
-                }
-                if (chn == null) { chn = guild.TextChannels.First(); }
-                if (!guild.TextChannels.Any()) return;
-                await chn.SendMessageAsync("", false, embed.Build());
+                 try
+                 {
+                     var ownerMbed = new EmbedBuilder();
+                     ownerMbed.Title = "Permissions required for Trade Memer";
+                     ownerMbed.Description = "\nAll the below permissions can easily be granted by giving Admin to the bot, however the bot needs ~\n\n`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*";
+                     ownerMbed.Color = Color.Red;
+                     await guild.Owner.SendMessageAsync("", false, ownerMbed.Build());
+                     await Task.Delay(20000);
+                     EmbedBuilder embed = new EmbedBuilder();
+                     embed.Color = Color.Purple;
+                     embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
+                     embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
+                     var chn = guild.SystemChannel as SocketTextChannel;
+                     if (guild.SystemChannel == null)
+                     {
+                         chn = guild.DefaultChannel;
+                     }
+                     if (chn == null) { chn = guild.TextChannels.First(); }
+                     if (!guild.TextChannels.Any()) return;
+                     await chn.SendMessageAsync("", false, embed.Build());
+                 } 
+                 catch (HttpException)
+                 {
+                     await guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
+                 }
             }).Start();
             
 
         }
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-
             //string logMsg = "";
             //logMsg += $"[UTC TIME - {DateTime.UtcNow.ToLongDateString() + " : " + DateTime.UtcNow.ToLongTimeString()}] ";
             string completed = resultformat(result.IsSuccess);
@@ -137,7 +136,6 @@ namespace DMCG_Answer
                     await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
                 }).Start();  
             }
-
         }
         internal static string resultformat(bool isSuccess)
         {
@@ -167,9 +165,15 @@ namespace DMCG_Answer
                         Console.WriteLine("User is not a bot.");
                         new System.Threading.Thread(async () =>
                         {
-                            var result = await _service.ExecuteAsync(context);
-                            Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + "(" + msg.Channel.GetType().ToString() + ")");
-                            await HandleCommandResult(result, msg);
+                            try
+                            {
+                                var result = await _service.ExecuteAsync(context);
+                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + "(" + msg.Channel.GetType().ToString() + ")");
+                                await HandleCommandResult(result, msg);
+                            } catch (HttpException)
+                            {
+                                await context.Guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
+                            }
                         }).Start();
                     }
 
@@ -179,7 +183,14 @@ namespace DMCG_Answer
                 {
                     var res = int.TryParse(msg.ToString()[0].ToString(), out int resultant);
                     if (!res) return;
-                    await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name);
+                    try
+                    {
+                        await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        await context.Channel.SendMessageAsync($"We are not in {resultant + 1} servers yet :grin:");
+                    }
                 }
             }
             catch (Exception e)
@@ -194,7 +205,6 @@ namespace DMCG_Answer
             var msg = await arg1.GetOrDownloadAsync();
             if (arg3 == null || !msg.Embeds.Any()) return;
             //Console.WriteLine("Run HRA");
-            
             var mBed = msg.Embeds.First();
             //Console.WriteLine("Embed success");
             //Console.WriteLine(arg3.Emote.Name);
@@ -227,11 +237,8 @@ namespace DMCG_Answer
                     {
                         await msg.RemoveReactionAsync(arg3.Emote, userReacter);
                     }
-
                 }).Start();
-            }
-            
+            }          
         }
-
     }
 }
