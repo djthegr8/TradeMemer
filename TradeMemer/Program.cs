@@ -94,8 +94,6 @@ namespace DMCG_Answer
                      await guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
                  }
             }).Start();
-            
-
         }
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
         {
@@ -176,7 +174,6 @@ namespace DMCG_Answer
                             }
                         }).Start();
                     }
-
                     else Console.WriteLine("User is bot");
                 }
                 else if (msg.ToString().Contains("show me da guildz"))

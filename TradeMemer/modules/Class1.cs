@@ -4,10 +4,8 @@ using Discord.Commands;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-
 namespace DMCG_Answer.modules
 {
-
     [DiscordCommandClass()]
     public class MyCommandClass : CommandModuleBase
     {
