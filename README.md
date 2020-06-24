@@ -22,6 +22,7 @@ We aren't at top.gg yet, so we don't really have a voting system, but this gives
 This simply gives the bot's ping.      
 ### About and Links     
 The bot is made by DJ001#0915, and was tested and played around with in the server [Dank Memer Casino and Giveaways](https://discord.me/dmcg)       
+[Here's the botsondiscord link for inviting it](https://bots.ondiscord.xyz/bots/722732239376613406)
 ### License
 We are licensed with Attribution-NonCommercial 3.0 United States, which simply means ~    
 #### You are free to -      
