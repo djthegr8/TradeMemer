@@ -21,6 +21,14 @@ We aren't at top.gg yet, so we don't really have a voting system, but this gives
 #### 4. !ping
 This simply gives the bot's ping.      
 ### Credits and Links     
-The bot is made by DJ001#0915, and was tested and played around with in the server [Dank Memer Casino and Giveaways](https://discord.me/dmcg)    
+The bot is made by DJ001#0915, and was tested and played around with in the server [Dank Memer Casino and Giveaways](https://discord.me/dmcg)     
+### License
+We are licensed with Attribution-NonCommercial 3.0 United States, which simply means ~    
+#### You are free to -      
+1. **Share** - copy and redistribute the material in any medium or format     
+2. **Adapt** — remix, transform, and build upon the material     
+#### Under the following terms -
+1. **Attribute** - You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.    
+2. **Non-Commercial** - You must not use the material for commercial purposes.   
 
 
