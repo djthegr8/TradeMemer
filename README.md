@@ -7,11 +7,13 @@ Just add a file called token.txt with your token for replication, in the folder 
 Although the bot is capable of making a new channel when given permissions to do so, however if you don't want to give admin/Manage Channels perms, you should make a channel called *marketplace* (case insensitive) which will be where the bot embeds will be printed.   
 ### Commands    
 #### !trade (quantity: integer) (item: string) (price: integer)
-This command is the basis of the bot. It takes the user's input irrespective of the channel, and prints a brief and clear embed in the *marketplace* channel. It should be ensured that the bot's item-name be a single word, we suggest using hyphenated words for multi-word itemname.     
+This command is the basis of the bot. It takes the user's input irrespective of the channel, and prints a brief and clear embed in the *marketplace* channel. It should be ensured that the bot's item-name be a single word, we suggest using hyphenated words for multi-word itemname.      
+     
 **Example:**     
 !trade 3 brains 20000    
 #### !idea (suggestion: list of strings)
-This command DMs the idea to our (DMCG) server's Owner (IMSlender) and this bot's Lead Dev (DJ001)    
+This command DMs the idea to our (DMCG) server's Owner (IMSlender) and this bot's Lead Dev (DJ001) 
+        
 **Example:**     
 !idea You guys should make a new cmd      
 #### !vote
