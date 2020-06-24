@@ -10,14 +10,15 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.VisualBasic;
 using Discord.Net;
-
+using System.IO;
+using System.Runtime.InteropServices;
 namespace DMCG_Answer
 { 
     class Program
     {
         IEmote Dealdone = new Emoji("🇩");
         IEmote tick = new Emoji("✅");
-
+        static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -48,24 +49,13 @@ namespace DMCG_Answer
             _client.ReactionAdded += HandleReactionAsync;
 
             _client.JoinedGuild += HandleJoinAsync;
-            //  You can assign your bot token to a string, and pass that in to connect.
-            //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
-            var token = "NzIyNzMyMjM5Mzc2NjEzNDA2.XuuhMQ.9YeszxS1VUXSxaeGWRgynQnVbck" +
-                "";
-
-            // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
-            // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
-            // var token = File.ReadAllText("token.txt");
-            // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
-
+            Console.WriteLine(fpath);
+            var token = File.ReadAllLines(fpath)[0];
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
             await _client.SetGameAsync("!trade help",null,ActivityType.Playing);
-
-            // Block this task until the program is closed.
             await Task.Delay(-1);
         }
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         internal async Task HandleJoinAsync(SocketGuild guild) {
              new Thread(async () => {
                  try
@@ -97,30 +87,7 @@ namespace DMCG_Answer
         }
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
         {
-            //string logMsg = "";
-            //logMsg += $"[UTC TIME - {DateTime.UtcNow.ToLongDateString() + " : " + DateTime.UtcNow.ToLongTimeString()}] ";
             string completed = resultformat(result.IsSuccess);
-            //if (!result.IsSuccess)
-            //    logMsg += $"COMMAND: {msg.Content} USER: {msg.Author.Username + "#" + msg.Author.Discriminator} COMMAND RESULT: {completed} ERROR TYPE: EXCEPTION: {result.Exception}";
-            //else
-            //    logMsg += $"COMMAND: {msg.Content} USER: {msg.Author.Username + "#" + msg.Author.Discriminator} COMMAND RESULT: {completed}";
-            //var name = DateTime.Now.Day + "_" + DateTime.Now.Month + "_" + DateTime.Now.Year;
-            //if (File.Exists(Global.CommandLogsDir + $"{Global.systemSlash}{name}.txt"))
-            //{
-            //    string curr = File.ReadAllText(Global.CommandLogsDir + $"{Global.systemSlash}{name}.txt");
-            //    File.WriteAllText(Global.CommandLogsDir + $"{Global.systemSlash}{name}.txt", $"{curr}\n{logMsg}");
-            //    Console.ForegroundColor = ConsoleColor.Magenta;
-            //    Console.WriteLine($"Logged Command (from {msg.Author.Username})");
-            //    Console.ForegroundColor = ConsoleColor.DarkGreen;
-            //}
-            //else
-            //{
-            //    File.Create(Global.MessageLogsDir + $"{Global.systemSlash}{name}.txt").Close();
-            //    File.WriteAllText(Global.CommandLogsDir + $"{Global.systemSlash}{name}.txt", $"{logMsg}");
-            //    Console.ForegroundColor = ConsoleColor.Cyan;
-            //    Console.WriteLine($"Logged Command (from {msg.Author.Username}) and created new logfile");
-            //    Console.ForegroundColor = ConsoleColor.DarkGreen;
-            //}
             if (result.IsSuccess)
             {
                 new Thread(async () => {
@@ -201,10 +168,7 @@ namespace DMCG_Answer
         {
             var msg = await arg1.GetOrDownloadAsync();
             if (arg3 == null || !msg.Embeds.Any()) return;
-            //Console.WriteLine("Run HRA");
             var mBed = msg.Embeds.First();
-            //Console.WriteLine("Embed success");
-            //Console.WriteLine(arg3.Emote.Name);
             if (arg2.Name == "marketplace" && mBed.Color == Color.Green)
             {
                 new Thread(async () =>
