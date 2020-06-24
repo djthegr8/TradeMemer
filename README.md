@@ -22,6 +22,9 @@ We aren't at top.gg yet, so we don't really have a voting system, but this gives
 This simply gives the bot's ping.      
 ### Credits and Links     
 The bot is made by DJ001#0915, and was tested and played around with in the server [Dank Memer Casino and Giveaways](https://discord.me/dmcg)     
+We are very grateful to all DMCG members for their suggestions.    
+To Discord.NET devs, which helped me make the very basis of this bot.    
+To quin, for making BetterCommandService and helping me in C#, without which I wouldn't have been able to make this bot.
 ### License
 We are licensed with Attribution-NonCommercial 3.0 United States, which simply means ~    
 #### You are free to -      
