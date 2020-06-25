@@ -184,14 +184,19 @@ namespace DMCG_Answer
                         await msg.DeleteAsync();
                         return;
                     }
+                    if (userSeller.Id == userReacter.Id) { 
+                        await msg.RemoveReactionAsync(arg3.Emote, userReacter);
+                        return;
+                    }
                     Console.WriteLine("First if passed");
                     if (arg3.Emote.Name == tick.Name)
                     {
                         Console.WriteLine("Second if passed");
                         var DMCReacter = await userReacter.GetOrCreateDMChannelAsync();
                         var DMCSeller = await userSeller.GetOrCreateDMChannelAsync();
-                        await DMCReacter.SendMessageAsync($"You have accepted a sale and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
-                        await DMCSeller.SendMessageAsync($"{userReacter} has accepted your deal! Contact them for finalizing.");
+                        var itemFull = mBed.Description.Split(' ')[4];
+                        await DMCReacter.SendMessageAsync($"You have accepted the sale of **{itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
+                        await DMCSeller.SendMessageAsync($"{userReacter} has accepted your deal of **{itemFull}! Contact them for finalizing.");
                         await Task.Delay(5000);
                     }
                     else
