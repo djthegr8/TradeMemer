@@ -4,14 +4,20 @@ using Discord.Commands;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using System;
 namespace DMCG_Answer.modules
 {
     [DiscordCommandClass()]
     public class MyCommandClass : CommandModuleBase
     {
         [DiscordCommand("trade")]
-        public async Task TradeCommand(int quantity, string item, int price)
+        public async Task TradeCommand(int quantity, string item, string priceZ)
         {
+            bool isPriceZ = int.TryParse(priceZ.Replace("k","000"), out int price);
+            if (!isPriceZ)
+            {
+                await ReplyAsync("Invalid price parameter!!");
+            }
             if (quantity == 0 || price == 0 || item == "")
             {
                 EmbedBuilder errorEmbed = new EmbedBuilder();
@@ -26,18 +32,18 @@ namespace DMCG_Answer.modules
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
             SocketCommandContext truContext = Context as SocketCommandContext;
-            if (!truContext.Guild.Channels.Any(x => x.Name.ToLower() == "marketplace"))
+            if (!truContext.Guild.Channels.Any(x => x.Name.ToLower().Contains("marketplace")))
             {
                 try
                 {
                     await truContext.Guild.CreateTextChannelAsync("marketplace");
                 }
-                catch (Discord.Net.HttpException)
+                catch (Exception)
                 {
                     await truContext.Channel.SendMessageAsync("I dont have perms to make a channel. If u have trust issues, then create a channel called marketplace.");
                 }
             }
-            ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower() == "marketplace").Id;
+            ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
             EmbedBuilder eb = new EmbedBuilder();
             eb.Title = "**" + item.ToUpper() + "** on sale";
             eb.Description = Context.User.Mention + " is placing **" + quantity + " " + item + "** on sale for " + price;
@@ -89,11 +95,9 @@ namespace DMCG_Answer.modules
             var mBed = new EmbedBuilder();
             mBed.Description = sug + "\n" + $"*Given by {Context.User.Username}#{Context.User.Discriminator}*";
             mBed.Title = $"**New bot suggestion from **{Context.Guild.Name}";
-            var DMCG = (await Context.Client.GetGuildAsync(591660163229024287));
-            var DJ = await DMCG.GetUserAsync(701029647760097361);
-            var Ket = await DMCG.GetUserAsync(541998151716962305);
-            await DJ.SendMessageAsync("",false, mBed.Build());
-            await Ket.SendMessageAsync("",false, mBed.Build());
+            var tM = await Context.Client.GetGuildAsync(725567523264659566);
+            var sugChan = await tM.GetChannelAsync(725584761640452118) as SocketTextChannel;
+            await sugChan.SendMessageAsync("", false, mBed.Build());
             await Task.Delay(2000);
         }
     }

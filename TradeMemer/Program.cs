@@ -169,7 +169,7 @@ namespace DMCG_Answer
             var msg = await arg1.GetOrDownloadAsync();
             if (arg3 == null || !msg.Embeds.Any()) return;
             var mBed = msg.Embeds.First();
-            if (arg2.Name == "marketplace" && mBed.Color == Color.Green)
+            if (arg2.Name.ToLower().Contains("marketplace") && mBed.Color == Color.Green)
             {
                 new Thread(async () =>
                 {
