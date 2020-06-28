@@ -5,7 +5,9 @@
 Just add a file called token.txt with your token for replication, in the folder printed when you run it.    
 *I have tried to make the code understandable, but as of now it isn't as detailed and commented as it should be...*   
 ### [Invite link for Trade Memer](https://bots.ondiscord.xyz/bots/722732239376613406)     
+*Invite the bot for an awesome trading system!!!*     
 ### [Invite link for support server!](https://discord.gg/XSkKyZ9)       
+*This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
 ### Setup for server    
 Although the bot is capable of making a new channel when given permissions to do so, however if you don't want to give admin/Manage Channels perms, you should make a channel called *marketplace* (case insensitive) which will be where the bot embeds will be printed.   
 ### Commands    
@@ -24,7 +26,7 @@ We aren't at top.gg yet, so we don't really have a voting system, but this gives
 #### 4. !ping
 This simply gives the bot's ping.      
 ### About and Links     
-The bot is made by [DJ001#0915](https://github.com/djthegr8) helped by [IMSlender](https://github.com/deathskull728), and was tested and played around with in the server [DMCG](https://discord.me/dmcg)       
+The bot is made by [DJ001#0915](https://github.com/djthegr8) helped by [IMSlender#0001](https://github.com/deathskull728), and was tested and played around with in the server [DMCG](https://discord.me/dmcg)       
 
 ### License
 We are licensed with Attribution-NonCommercial 3.0 United States, which simply means ~    
