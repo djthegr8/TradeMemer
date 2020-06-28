@@ -44,7 +44,7 @@ namespace DMCG_Answer.modules
             ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
             EmbedBuilder eb = new EmbedBuilder();
             
-            if (buyin[0] == 'b')
+            if (buyin == 'b')
             {
                 eb.Title = $"**{item.ToUpper()}** in demand!";
                 eb.Color = Color.Blue;
