@@ -19,6 +19,7 @@ namespace DMCG_Answer
         IEmote Dealdone = new Emoji("🇩");
         IEmote tick = new Emoji("✅");
         static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
+        int totalus = 0;
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -117,6 +118,14 @@ namespace DMCG_Answer
             try
             {
                 if (msg == null) return;
+                if (msg.Content.ToLower().Contains("tmstart"))
+                {
+                    foreach(SocketGuild socket in _client.Guilds)
+                    {
+                        totalus += socket.MemberCount;
+                    }
+                    await _client.SetGameAsync($"!trade help with {totalus} users", null);
+                }
                 if (msg.Channel.GetType() == typeof(SocketDMChannel)) {
                     return; 
                 }
@@ -145,7 +154,7 @@ namespace DMCG_Answer
                 }
                 else if (msg.ToString().Contains("show me da guildz"))
                 {
-                    var res = int.TryParse(msg.ToString()[0].ToString(), out int resultant);
+                    var res = int.TryParse(msg.Content.Split(' ')[0], out int resultant);
                     if (!res) return;
                     try
                     {
@@ -169,7 +178,7 @@ namespace DMCG_Answer
             var msg = await arg1.GetOrDownloadAsync();
             if (arg3 == null || !msg.Embeds.Any()) return;
             var mBed = msg.Embeds.First();
-            if (arg2.Name.ToLower().Contains("marketplace") && mBed.Color == Color.Green)
+            if (arg2.Name.ToLower().Contains("marketplace"))
             {
                 new Thread(async () =>
                 {
@@ -195,8 +204,16 @@ namespace DMCG_Answer
                         var DMCReacter = await userReacter.GetOrCreateDMChannelAsync();
                         var DMCSeller = await userSeller.GetOrCreateDMChannelAsync();
                         var itemFull = mBed.Description.Split(' ')[4];
-                        await DMCReacter.SendMessageAsync($"You have accepted the sale of **{itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
-                        await DMCSeller.SendMessageAsync($"{userReacter} has accepted your deal of **{itemFull}! Contact them for finalizing.");
+                        if (mBed.Color == Color.Green)
+                        {
+                            await DMCReacter.SendMessageAsync($"You have accepted the sale of **{itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has accepted your deal of **{itemFull}! Contact them for finalizing.");
+                        }
+                        else if (mBed.Color == Color.Blue)
+                        {
+                            await DMCReacter.SendMessageAsync($"You have offered to sell {itemFull} to {userSeller.Username} and a DM has been sent to them!\nYou can expect a reply shortly.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has {itemFull} to sell!! Contact them for finalizing.");
+                        }
                         await Task.Delay(5000);
                     }
                     else
