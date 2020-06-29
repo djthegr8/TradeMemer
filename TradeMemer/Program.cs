@@ -99,7 +99,13 @@ namespace DMCG_Answer
                     eb.Footer = new EmbedFooterBuilder();
                     eb.Footer.Text = "Command Autogen";
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
-                    await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
+                    try
+                    {
+                        await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
+                    }
+                    catch (Exception) {
+                        await _client.GetUser(541998151716962305).SendMessageAsync("BUFFOON GIMME PERMS smh");
+                    }
                 }).Start();  
             }
         }
@@ -207,12 +213,12 @@ namespace DMCG_Answer
                         if (mBed.Color == Color.Green)
                         {
                             await DMCReacter.SendMessageAsync($"You have accepted the sale of **{itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
-                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has accepted your deal of **{itemFull}! Contact them for finalizing.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has accepted your deal of **{itemFull} in {(arg2 as SocketGuildChannel).Guild.Name}! Contact them for finalizing.");
                         }
                         else if (mBed.Color == Color.Blue)
                         {
-                            await DMCReacter.SendMessageAsync($"You have offered to sell {itemFull} to {userSeller.Username} and a DM has been sent to them!\nYou can expect a reply shortly.");
-                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has {itemFull} to sell!! Contact them for finalizing.");
+                            await DMCReacter.SendMessageAsync($"You have offered to sell **{itemFull} to {userSeller.Username} and a DM has been sent to them!\nYou can expect a reply shortly.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has **{itemFull} to sell in {(arg2 as SocketGuildChannel).Guild.Name}!! Contact them for finalizing.");
                         }
                         await Task.Delay(5000);
                     }
