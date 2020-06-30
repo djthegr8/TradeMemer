@@ -10,20 +10,25 @@ Just add a file called token.txt with your token for replication, in the folder 
 *This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
 ### Setup for server    
 Although the bot is capable of making a new channel when given permissions to do so, however if you don't want to give admin/Manage Channels perms, you should make a channel called *marketplace* (case insensitive) which will be where the bot embeds will be printed.   
-### Commands    
-#### 1. !trade (quantity: integer) (item: string) (price: integer)
+### Trading Commands     
+#### 1. !trade (quantity: integer) (item: string) (price/barter-item: string)
 This command is the basis of the bot. It takes the user's input irrespective of the channel, and prints a brief and clear embed in the *marketplace* channel. It should be ensured that the bot's item-name be a single word, we suggest using hyphenated words for multi-word itemname.      
      
 **Example:**     
-!trade 3 brains 20000    
-#### 2. !idea (suggestion: list of strings)
+!trade 3 brains 20000     
+
+#### 2. !buying (quantity: integer) (item: string) (price/barter-item: string)      
+This is a public demand command for requesting a sale, when you wish to buy something. It works exactly the same way as the trade command.
+
+### Non-trading commands
+#### 1. !idea (suggestion: list of strings)
 This command DMs the idea to our (DMCG) server's Owner (IMSlender) and this bot's Lead Dev (DJ001) 
         
 **Example:**     
 !idea You guys should make a new cmd      
-#### 3. !vote
+#### 2. !vote
 We aren't at top.gg yet, so we don't really have a voting system, but this gives the link to our botsondiscord page.    
-#### 4. !ping
+#### 3. !ping
 This simply gives the bot's ping.      
 ### About and Links     
 The bot is made by [DJ001#0915](https://github.com/djthegr8) helped by [IMSlender#0001](https://github.com/deathskull728), and was tested and played around with in the server [DMCG](https://discord.me/dmcg)       
