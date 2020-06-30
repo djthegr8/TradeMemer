@@ -19,7 +19,6 @@ namespace DMCG_Answer
         IEmote Dealdone = new Emoji("🇩");
         IEmote tick = new Emoji("✅");
         static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
-        int totalus = 0;
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -50,6 +49,8 @@ namespace DMCG_Answer
             _client.ReactionAdded += HandleReactionAsync;
 
             _client.JoinedGuild += HandleJoinAsync;
+
+            _client.LatencyUpdated += StatusUpdateAsync;
             Console.WriteLine(fpath);
             var token = File.ReadAllLines(fpath)[0];
             await _client.LoginAsync(TokenType.Bot, token);
@@ -80,7 +81,7 @@ namespace DMCG_Answer
                      if (!guild.TextChannels.Any()) return;
                      await chn.SendMessageAsync("", false, embed.Build());
                  } 
-                 catch (HttpException)
+                 catch (Exception)
                  {
                      await guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
                  }
@@ -109,6 +110,30 @@ namespace DMCG_Answer
                 }).Start();  
             }
         }
+        internal async Task StatusUpdateAsync(int arg1, int arg2)
+        {
+            ulong alusr = 0;
+            _client.Guilds.ToList().ForEach(x => alusr = alusr + (ulong)x.Users.Count);
+            string[] status = new string[]
+            {
+                $"Trading in {_client.Guilds.Count} unique servers!",
+                $"Serving {alusr} Users in {_client.Guilds.Count} Different Guilds",
+                $"Executing trades..",
+                $"Running the batch file",
+                $"Handling exceptions",
+                $"Trading with {alusr} different users!",
+                $"Opening a new portal to the parallel universe",
+                $"Searching for buyers",
+                $"Crying in binary",
+                $"C# > js",
+                $"Gambling with Dank Memer",
+                $"Thanking Swiss001 devs",
+                $"Searching for the singularity",
+                $"Chilling with my Bro",
+                $"Preparing for the Bot Oscars!"
+            };
+            await _client.SetGameAsync($"!trade help - {status[new Random().Next(0, status.Length - 1)]}", null, ActivityType.Playing);
+        }
         internal static string resultformat(bool isSuccess)
         {
             if (isSuccess)
@@ -124,14 +149,6 @@ namespace DMCG_Answer
             try
             {
                 if (msg == null) return;
-                if (msg.Content.ToLower().Contains("tmstart"))
-                {
-                    foreach(SocketGuild socket in _client.Guilds)
-                    {
-                        totalus += socket.MemberCount;
-                    }
-                    await _client.SetGameAsync($"!trade help with {totalus} users", null);
-                }
                 if (msg.Channel.GetType() == typeof(SocketDMChannel)) {
                     return; 
                 }
@@ -148,7 +165,7 @@ namespace DMCG_Answer
                             try
                             {
                                 var result = await _service.ExecuteAsync(context);
-                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + "(" + msg.Channel.GetType().ToString() + ")");
+                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + "of guild " + context.Guild.Name);
                                 await HandleCommandResult(result, msg);
                             } catch (HttpException)
                             {
@@ -164,7 +181,7 @@ namespace DMCG_Answer
                     if (!res) return;
                     try
                     {
-                        await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name);
+                        await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name + "\n" + _client.Guilds.ElementAt(resultant).MemberCount);
                     }
                     catch (ArgumentOutOfRangeException)
                     {
@@ -209,16 +226,16 @@ namespace DMCG_Answer
                         Console.WriteLine("Second if passed");
                         var DMCReacter = await userReacter.GetOrCreateDMChannelAsync();
                         var DMCSeller = await userSeller.GetOrCreateDMChannelAsync();
-                        var itemFull = mBed.Description.Split(' ')[4];
+                        var itemFull = mBed.Title.Split(' ')[0];
                         if (mBed.Color == Color.Green)
                         {
-                            await DMCReacter.SendMessageAsync($"You have accepted the sale of **{itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
-                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has accepted your deal of **{itemFull} in {(arg2 as SocketGuildChannel).Guild.Name}! Contact them for finalizing.");
+                            await DMCReacter.SendMessageAsync($"You have accepted the sale of {itemFull} and a DM has been sent to {userSeller.Username}.\nYou can expect a reply shortly.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has accepted your deal of {itemFull} in {(arg2 as SocketGuildChannel).Guild.Name}! Contact them for finalizing.");
                         }
                         else if (mBed.Color == Color.Blue)
                         {
-                            await DMCReacter.SendMessageAsync($"You have offered to sell **{itemFull} to {userSeller.Username} and a DM has been sent to them!\nYou can expect a reply shortly.");
-                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has **{itemFull} to sell in {(arg2 as SocketGuildChannel).Guild.Name}!! Contact them for finalizing.");
+                            await DMCReacter.SendMessageAsync($"You have offered to sell {itemFull} to {userSeller.Username} and a DM has been sent to them!\nYou can expect a reply shortly.");
+                            await DMCSeller.SendMessageAsync($"{userReacter.Username} has {itemFull} to sell in {(arg2 as SocketGuildChannel).Guild.Name}!! Contact them for finalizing.");
                         }
                         await Task.Delay(5000);
                     }

@@ -52,6 +52,7 @@ namespace DMCG_Answer.modules
             var chnl = truContext.Guild.GetTextChannel(chnlId);
             var res = await chnl.SendMessageAsync(chn, false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
+            await res.AddReactionAsync(new Emoji("🇩"));
             await ReplyAsync($"Your buyer's request of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
             if (regret.Next(0, 9) > 6)
             {
@@ -104,6 +105,7 @@ namespace DMCG_Answer.modules
             var chnl = truContext.Guild.GetTextChannel(chnlId);
             var res = await chnl.SendMessageAsync(chn, false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
+            await res.AddReactionAsync(new Emoji("🇩"));
             await ReplyAsync($"Your sale of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
             if (regret.Next(0,9) > 6)
             {
@@ -122,9 +124,9 @@ namespace DMCG_Answer.modules
         {
             EmbedBuilder errorEmbed = new EmbedBuilder();
             errorEmbed.Title = "**Trade Memer help**";
-            errorEmbed.Description = "**Trading Commands**\n``!trade`` is the command for putting a sale \n``!trade [quantity] [itemname] [price]``\nWhile ``!buying`` is the command for requesting a trade\nReact with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :regional_indicator_d: to declare the deal as closed.\n**Non trading commands**\n``!idea``\nHave a suggesion for the bot? Tell it here!!!\n\n``!vote``\n Gives the link for bot's site\n\n``!ping``\nGets the ping of the bot";
+            errorEmbed.Description = "**Trading Commands**\n``!trade`` is the command for putting a sale \n``!trade [quantity] [itemname] [price]``\nWhile ``!buying`` is the command for requesting a trade\n``!buying [quantity] [itemname] [price]``\nReact with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :regional_indicator_d: to declare the deal as closed.\n\n**Non trading commands**\n``!idea``\nHave a suggesion for the bot? Tell it here!!!\n\n``!vote``\n Gives the link for bot's site\n\n``!ping``\nGets the ping of the bot";
             errorEmbed.Footer = new EmbedFooterBuilder();
-            errorEmbed.AddField("Join our support server!", "[If not done already, **join our support server today!**](https://discord.gg/QtzrtGr)");
+            errorEmbed.AddField("We have our very own support server!", "[If not done already, **join our support server today!**](https://discord.gg/QtzrtGr)");
             await Context.Channel.SendMessageAsync("", false, errorEmbed.Build());
         }
 
