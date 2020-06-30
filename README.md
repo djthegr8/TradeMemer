@@ -20,6 +20,7 @@ This command is the basis of the bot. It takes the user's input irrespective of 
 #### 2. !buying (quantity: integer) (item: string) (price/barter-item: string)      
 This is a public demand command for requesting a sale, when you wish to buy something. It works exactly the same way as the trade command.
 
+### Non-trading commands
 #### 1. !idea (suggestion: list of strings)
 This command DMs the idea to our (DMCG) server's Owner (IMSlender) and this bot's Lead Dev (DJ001) 
         
