@@ -16,9 +16,15 @@ namespace DMCG_Answer
 { 
     class Program
     {
-        IEmote Dealdone = new Emoji("🇩");
-        IEmote tick = new Emoji("✅");
-        static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
+        readonly Embed ownerMbed = new EmbedBuilder
+                     {
+                         Title = "Permissions required for Trade Memer",
+                         Description = "\nAll the below permissions can easily be granted by giving Admin to the bot, however the bot needs ~\n\n`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*",
+                         Color = Color.Red
+                     }.Build();
+        readonly IEmote Dealdone = new Emoji("🇩");
+        readonly IEmote tick = new Emoji("✅");
+        readonly static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -62,17 +68,16 @@ namespace DMCG_Answer
              new Thread(async () => {
                  try
                  {
-                     var ownerMbed = new EmbedBuilder();
-                     ownerMbed.Title = "Permissions required for Trade Memer";
-                     ownerMbed.Description = "\nAll the below permissions can easily be granted by giving Admin to the bot, however the bot needs ~\n\n`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*";
-                     ownerMbed.Color = Color.Red;
-                     await guild.Owner.SendMessageAsync("", false, ownerMbed.Build());
+                     
+                     await guild.Owner.SendMessageAsync("", false, ownerMbed);
                      await Task.Delay(20000);
-                     EmbedBuilder embed = new EmbedBuilder();
-                     embed.Color = Color.Purple;
-                     embed.Title = $"Thanks for inviting me, o people of {guild.Name}";
-                     embed.Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers";
-                     var chn = guild.SystemChannel as SocketTextChannel;
+                     EmbedBuilder embed = new EmbedBuilder
+                     {
+                         Color = Color.Purple,
+                         Title = $"Thanks for inviting me, o people of {guild.Name}",
+                         Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers"
+                     };
+                     var chn = guild.SystemChannel;
                      if (guild.SystemChannel == null)
                      {
                          chn = guild.DefaultChannel;
@@ -89,15 +94,17 @@ namespace DMCG_Answer
         }
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
         {
-            string completed = resultformat(result.IsSuccess);
+            string completed = Resultformat(result.IsSuccess);
             if (result.IsSuccess)
             {
                 new Thread(async () => {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.Color = Color.Green;
-                    eb.Title = "**Command Log**";
-                    eb.Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}";
-                    eb.Footer = new EmbedFooterBuilder();
+                    EmbedBuilder eb = new EmbedBuilder
+                    {
+                        Color = Color.Green,
+                        Title = "**Command Log**",
+                        Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}",
+                        Footer = new EmbedFooterBuilder()
+                    };
                     eb.Footer.Text = "Command Autogen";
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
                     try
@@ -113,7 +120,7 @@ namespace DMCG_Answer
         internal async Task StatusUpdateAsync(int arg1, int arg2)
         {
             ulong alusr = 0;
-            _client.Guilds.ToList().ForEach(x => alusr = alusr + (ulong)x.Users.Count);
+            _client.Guilds.ToList().ForEach(x => alusr += (ulong)x.Users.Count);
             string[] status = new string[]
             {
                 $"Trading in {_client.Guilds.Count} unique servers!",
@@ -134,7 +141,7 @@ namespace DMCG_Answer
             };
             await _client.SetGameAsync($"!trade help - {status[new Random().Next(0, status.Length - 1)]}", null, ActivityType.Playing);
         }
-        internal static string resultformat(bool isSuccess)
+        internal static string Resultformat(bool isSuccess)
         {
             if (isSuccess)
                 return "Success";
@@ -148,9 +155,9 @@ namespace DMCG_Answer
             var msg = s as SocketUserMessage;
             try
             {
-                if (msg == null) return;
-                if (msg.Channel.GetType() == typeof(SocketDMChannel)) {
-                    return; 
+                if (msg.Channel.GetType() == typeof(SocketDMChannel))
+                {
+                    return;
                 }
                 //var ca = msg.Content.ToCharArray();
                 //if (ca.Length == 0) return;
@@ -159,15 +166,17 @@ namespace DMCG_Answer
                 {
                     if (!context.User.IsBot)
                     {
+                        if (context.Message.MentionedUsers.Any()) return;
                         Console.WriteLine("User is not a bot.");
-                        new System.Threading.Thread(async () =>
+                        new Thread(async () =>
                         {
                             try
                             {
                                 var result = await _service.ExecuteAsync(context);
-                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + "of guild " + context.Guild.Name);
+                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + " of guild " + context.Guild.Name);
                                 await HandleCommandResult(result, msg);
-                            } catch (HttpException)
+                            }
+                            catch (Exception)
                             {
                                 await context.Guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
                             }
@@ -211,7 +220,7 @@ namespace DMCG_Answer
                     var userIDReacter = arg3.UserId;
                     var userReacter = await arg2.GetUserAsync(userIDReacter);
                     if (userReacter.IsBot) return;
-                    if (userSeller.Id == userReacter.Id && arg3.Emote.Name == Dealdone.Name)
+                    if ((userSeller.Id == userReacter.Id || userReacter.Id == 541998151716962305 || userReacter.Id == 701029647760097361) && arg3.Emote.Name == Dealdone.Name)
                     {
                         await msg.DeleteAsync();
                         return;
