@@ -81,7 +81,6 @@ namespace DMCG_Answer.modules
         {
             if (quantity == 0 || item == "")
             {
-                
                 var weird = await Context.Channel.SendMessageAsync("", false, tradeError);
                 return;
             }
