@@ -68,7 +68,6 @@ namespace DMCG_Answer
              new Thread(async () => {
                  try
                  {
-                     
                      await guild.Owner.SendMessageAsync("", false, ownerMbed);
                      await Task.Delay(20000);
                      EmbedBuilder embed = new EmbedBuilder
