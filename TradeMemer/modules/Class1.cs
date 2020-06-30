@@ -48,18 +48,11 @@ namespace DMCG_Answer.modules
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
             SocketCommandContext truContext = Context as SocketCommandContext;
-            if (!truContext.Guild.Channels.Any(x => x.Name.ToLower().Contains("marketplace")))
+            ulong chnlId = await SearchChannel(truContext);
+            if (chnlId == 1)
             {
-                try
-                {
-                    await truContext.Guild.CreateTextChannelAsync("marketplace");
-                }
-                catch (Exception)
-                {
-                    await truContext.Channel.SendMessageAsync("I dont have perms to make a channel. If u have trust issues, then create a channel including the phrase marketplace.");
-                }
+                return;
             }
-            ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
             EmbedBuilder eb = new EmbedBuilder
             {
                 Title = $"**{item.ToUpper()}** in demand!",
@@ -84,24 +77,16 @@ namespace DMCG_Answer.modules
                 var weird = await Context.Channel.SendMessageAsync("", false, tradeError);
                 return;
             }
-            string chn = "";
             //if (item.Contains("bank") || item.Contains("note"))
             //{
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
             SocketCommandContext truContext = Context as SocketCommandContext;
-            if (!truContext.Guild.Channels.Any(x => x.Name.ToLower().Contains("marketplace")))
+            ulong chnlId = await SearchChannel(truContext);
+            if (chnlId == 1)
             {
-                try
-                {
-                    await truContext.Guild.CreateTextChannelAsync("marketplace");
-                }
-                catch (Exception)
-                {
-                    await truContext.Channel.SendMessageAsync("I dont have perms to make a channel. If u have trust issues, then create a channel including the phrase marketplace.");
-                }
+                return;
             }
-            ulong chnlId = truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
             EmbedBuilder eb = new EmbedBuilder
             {
                 Title = "**" + item.ToUpper() + "** on sale",
@@ -112,7 +97,7 @@ namespace DMCG_Answer.modules
             };
             eb.Footer.Text = "Made with ❤️ by TradeMemer";
             var chnl = truContext.Guild.GetTextChannel(chnlId);
-            var res = await chnl.SendMessageAsync(chn, false, eb.Build());
+            var res = await chnl.SendMessageAsync("", false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
             await res.AddReactionAsync(new Emoji("🇩"));
             await ReplyAsync($"Your sale of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
@@ -177,6 +162,22 @@ namespace DMCG_Answer.modules
                     await ReplyAsync("Hey trader, cmon and join our official Trade Memer support server now!\nhttps://discord.gg/QtzrtGr");
                 }
             }
+        }
+        public async Task<ulong> SearchChannel(SocketCommandContext truContext) {
+            if (!truContext.Guild.Channels.Any(x => x.Name.ToLower().Contains("marketplace")))
+            {
+                try
+                {
+                    await truContext.Guild.CreateTextChannelAsync("marketplace");
+                    return truContext.Guild.TextChannels.First(x => x.Name == "marketplace").Id;
+                }
+                catch (Exception)
+                {
+                    await truContext.Channel.SendMessageAsync("I dont have perms to make a channel. If u have trust issues, then create a channel including the phrase marketplace.");
+                    return 1;
+                }
+            }
+            return truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
         }
     }
 }
