@@ -47,7 +47,8 @@ namespace DMCG_Answer.modules
             //{
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
-            price = await Preprocess(price);
+            bool isTrader;
+            (price,isTrader) = await Preprocess(price);
             SocketCommandContext truContext = Context as SocketCommandContext;
             ulong chnlId = await SearchChannel(truContext);
             if (chnlId == 1)
@@ -58,16 +59,19 @@ namespace DMCG_Answer.modules
             {
                 Title = $"**{item.ToUpper()}** in demand!",
                 Color = Color.Blue,
-                Description = Context.User.Mention + " wants to buy **" + quantity + " " + item + "** and is willing to pay " + price,
+                //Description = Context.User.Mention + " wants to buy **" + quantity + " " + item + "** and is willing to pay " + price,
                 ThumbnailUrl = Context.User.GetAvatarUrl(),
                 Footer = new EmbedFooterBuilder()
             };
+            if (isTrader) eb.Description = $"{Context.User.Mention} wants to buy **{quantity} {item} ** and is willing to pay {price}";
+            else eb.Description = $"{Context.User.Mention} wants to buy **{quantity} {item} ** and is willing to barter {price}";
             eb.Footer.Text = "Made with ❤️ by TradeMemer";
             var chnl = truContext.Guild.GetTextChannel(chnlId);
             var res = await chnl.SendMessageAsync(chn, false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
             await res.AddReactionAsync(new Emoji("🇩"));
-            await ReplyAsync($"Your buyer's request of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
+            if (isTrader) await ReplyAsync($"Your buyer's request of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
+            else await ReplyAsync($"Your barter request of {quantity} {item} for {price} has been mentioned in {chnl.Mention}!");
             await Bleh();
         }
         [DiscordCommand("trade")]
@@ -78,6 +82,8 @@ namespace DMCG_Answer.modules
                 await Context.Channel.SendMessageAsync("", false, tradeError);
                 return;
             }
+            bool isTrader;
+            (price,isTrader) = await Preprocess(price);
             SocketCommandContext truContext = Context as SocketCommandContext;
             ulong chnlId = await SearchChannel(truContext);
             if (chnlId == 1)
@@ -88,16 +94,19 @@ namespace DMCG_Answer.modules
             {
                 Title = "**" + item.ToUpper() + "** on sale",
                 Color = Color.Green,
-                Description = Context.User.Mention + " is placing **" + quantity + " " + item + "** on sale for " + price,
+                //Description = Context.User.Mention + " is placing **" + quantity + " " + item + "** on sale for " + price,
                 ThumbnailUrl = Context.User.GetAvatarUrl(),
                 Footer = new EmbedFooterBuilder(),
             };
             eb.Footer.Text = "Made with ❤️ by TradeMemer";
+            if (isTrader) eb.Description = $"{Context.User.Mention} is placing **{quantity} {item} ** on sale for {price}";
+            else eb.Description = $"{Context.User.Mention} is placing **{quantity} {item} ** on sale and is willing to exchange {price}";
             var chnl = truContext.Guild.GetTextChannel(chnlId);
             var res = await chnl.SendMessageAsync("", false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
             await res.AddReactionAsync(new Emoji("🇩"));
-            await ReplyAsync($"Your sale of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
+            if (isTrader) await ReplyAsync($"Your sale of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!");
+            else await ReplyAsync($"Your barter of {quantity} {item} for {price} has been mentioned in {chnl.Mention}!");
             await Bleh();
         }
         [DiscordCommand("trade")]
@@ -148,7 +157,7 @@ namespace DMCG_Answer.modules
             await Task.Delay(2000);
         }
         public async Task Bleh() {
-            if (regret.Next(0, 10) > 6)
+            if (regret.Next(0, 6) == 2)
             {
                 if (regret.Next(0, 10) > 4)
                 {
@@ -176,24 +185,27 @@ namespace DMCG_Answer.modules
             }
             return truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
         }
-        public async Task<string> Preprocess(string s)
+        public async Task<(string,bool)> Preprocess(string s)
         {
-            string toR =  await Task.Run<string>(() =>
+            bool alf;
+            string tor = "";
+            (tor, alf) =  await Task.Run(() =>
             {
                 int rem = s.Length - 1;
                 bool isVal = float.TryParse(s.Remove(s.Length - 1, 1), out float test);
                 Console.WriteLine(isVal);
-                if (isVal)
+                if (isVal && (s.ToLower()[rem] == 'k' || s.ToLower()[rem] == 'm'))
                 {
-                    test *= (Convert.ToInt32(s[rem] == 'k') * 1000) + (Convert.ToInt32(s[rem] == 'm') * 1000000);
-                    return test.ToString("#,##0");
+                    test *= (Convert.ToInt32(s.ToLower()[rem] == 'k') * 1000) + (Convert.ToInt32(s.ToLower()[rem] == 'm') * 1000000);
+                    return (test.ToString("#,##0"), isVal);
                 }
                 else
                 {
-                    return s;
+                    isVal = false;
+                    return (s,isVal);
                 }
             });
-            return toR;
+            return (tor,alf);
         }
     }
 }

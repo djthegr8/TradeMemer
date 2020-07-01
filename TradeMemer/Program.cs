@@ -156,6 +156,7 @@ namespace DMCG_Answer
             var msg = s as SocketUserMessage;
             try
             {
+                if (msg == null) return;
                 if (msg.Channel.GetType() == typeof(SocketDMChannel))
                 {
                     return;
