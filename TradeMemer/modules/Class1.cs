@@ -39,7 +39,7 @@ namespace DMCG_Answer.modules
         {
             if (quantity == 0 || item == "")
             {               
-                var weird = await Context.Channel.SendMessageAsync("", false, buyError);
+                await Context.Channel.SendMessageAsync("", false, buyError);
                 return;
             }
             string chn = "";
@@ -47,6 +47,7 @@ namespace DMCG_Answer.modules
             //{
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
+            price = await Preprocess(price);
             SocketCommandContext truContext = Context as SocketCommandContext;
             ulong chnlId = await SearchChannel(truContext);
             if (chnlId == 1)
@@ -74,13 +75,9 @@ namespace DMCG_Answer.modules
         {
             if (quantity == 0 || item == "")
             {
-                var weird = await Context.Channel.SendMessageAsync("", false, tradeError);
+                await Context.Channel.SendMessageAsync("", false, tradeError);
                 return;
             }
-            //if (item.Contains("bank") || item.Contains("note"))
-            //{
-            //    chn = Context.Guild.GetRole(717619391151341599).Mention;
-            //}
             SocketCommandContext truContext = Context as SocketCommandContext;
             ulong chnlId = await SearchChannel(truContext);
             if (chnlId == 1)
@@ -178,6 +175,25 @@ namespace DMCG_Answer.modules
                 }
             }
             return truContext.Guild.TextChannels.First(x => x.Name.ToLower().Contains("marketplace")).Id;
+        }
+        public async Task<string> Preprocess(string s)
+        {
+            string toR =  await Task.Run<string>(() =>
+            {
+                int rem = s.Length - 1;
+                bool isVal = float.TryParse(s.Remove(s.Length - 1, 1), out float test);
+                Console.WriteLine(isVal);
+                if (isVal)
+                {
+                    test *= (Convert.ToInt32(s[rem] == 'k') * 1000) + (Convert.ToInt32(s[rem] == 'm') * 1000000);
+                    return test.ToString("#,##0");
+                }
+                else
+                {
+                    return s;
+                }
+            });
+            return toR;
         }
     }
 }

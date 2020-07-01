@@ -96,12 +96,13 @@ namespace DMCG_Answer
             string completed = Resultformat(result.IsSuccess);
             if (result.IsSuccess)
             {
-                new Thread(async () => {
+                new Thread(async () =>
+                {
                     EmbedBuilder eb = new EmbedBuilder
                     {
                         Color = Color.Green,
                         Title = "**Command Log**",
-                        Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}",
+                        Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} of {(msg.Channel as SocketTextChannel).Guild.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}",
                         Footer = new EmbedFooterBuilder()
                     };
                     eb.Footer.Text = "Command Autogen";
@@ -110,7 +111,8 @@ namespace DMCG_Answer
                     {
                         await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
                     }
-                    catch (Exception) {
+                    catch (Exception)
+                    {
                         await _client.GetUser(541998151716962305).SendMessageAsync("BUFFOON GIMME PERMS smh");
                     }
                 }).Start();  
