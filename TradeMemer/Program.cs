@@ -12,10 +12,15 @@ using Microsoft.VisualBasic;
 using Discord.Net;
 using System.IO;
 using System.Runtime.InteropServices;
-namespace DMCG_Answer
+using TradeMemer.modules;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+
+namespace TradeMemer
 { 
     class Program
     {
+        List<UserCriminalRecord> lis;
         readonly Embed ownerMbed = new EmbedBuilder
                      {
                          Title = "Permissions required for Trade Memer",
@@ -74,7 +79,7 @@ namespace DMCG_Answer
                      {
                          Color = Color.Purple,
                          Title = $"Thanks for inviting me, o people of {guild.Name}",
-                         Description = "Do !trade to start right off!!!\nAnd if you feel like, do !vote for helping us help more servers"
+                         Description = "Do !trade help to start right off!!!\nAnd if you feel like, do !invite for helping us help more servers"
                      };
                      var chn = guild.SystemChannel;
                      if (guild.SystemChannel == null)
@@ -107,14 +112,7 @@ namespace DMCG_Answer
                     };
                     eb.Footer.Text = "Command Autogen";
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
-                    try
-                    {
-                        await _client.GetGuild(591660163229024287).GetTextChannel(712144160383041597).SendMessageAsync("", false, eb.Build());
-                    }
-                    catch (Exception)
-                    {
-                        await _client.GetUser(541998151716962305).SendMessageAsync("BUFFOON GIMME PERMS smh");
-                    }
+                    await _client.GetGuild(730634262788833281).GetTextChannel(730653816294342709).SendMessageAsync("", false, eb.Build());
                 }).Start();  
             }
         }
@@ -133,14 +131,14 @@ namespace DMCG_Answer
                 $"Opening a new portal to the parallel universe",
                 $"Searching for buyers",
                 $"Crying in binary",
-                $"C# > js",
+                $"Programming in TensorFlow",
                 $"Gambling with Dank Memer",
                 $"Thanking Swiss001 devs",
                 $"Searching for the singularity",
                 $"Chilling with my Bro",
                 $"Preparing for the Bot Oscars!"
             };
-            await _client.SetGameAsync($"!trade help - {status[new Random().Next(0, status.Length - 1)]}", null, ActivityType.Playing);
+            await _client.SetGameAsync($"!trade help - {status[new Random().Next(0, status.Length)]}", null, ActivityType.Playing);
         }
         internal static string Resultformat(bool isSuccess)
         {
@@ -161,14 +159,36 @@ namespace DMCG_Answer
                 {
                     return;
                 }
-                //var ca = msg.Content.ToCharArray();
-                //if (ca.Length == 0) return;
-                var context = new SocketCommandContext(_client, msg);
+                
+                    //var ca = msg.Content.ToCharArray();
+                    //if (ca.Length == 0) return;
+                    var context = new SocketCommandContext(_client, msg);
+                
                 if (_service.ContainsUsedPrefix(msg.ToString()))
                 {
+                    using (StreamReader r = new StreamReader($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}trader.json"))
+                    {
+                        string json = r.ReadToEnd();
+                        r.Close();
+                        lis = JsonConvert.DeserializeObject<List<UserCriminalRecord>>(json);
+                    }
+
+                    if (lis.Any(x => x.UserId == msg.Author.Id))
+                    {
+                        var x = lis.First(x => x.UserId == msg.Author.Id);
+                        if (x.Reports.Count == 3)
+                        {
+                            Embed m = new EmbedBuilder
+                            {
+                                Title = "You are banned from using TradeMemer",
+                                Description = "Due to three reports by Server Admins of different servers, you have been banned. \nIf you think this is a mistake, DM DJ001#0915"
+                            }.Build();
+                            await msg.Channel.SendMessageAsync("",false,m);
+                            return;
+                        }
+                    }
                     if (!context.User.IsBot)
                     {
-                        if (context.Message.MentionedUsers.Any()) return;
                         Console.WriteLine("User is not a bot.");
                         new Thread(async () =>
                         {
@@ -186,18 +206,15 @@ namespace DMCG_Answer
                     }
                     else Console.WriteLine("User is bot");
                 }
-                else if (msg.ToString().Contains("show me da guildz"))
+                else if (msg.ToString().Contains("show me da guildz") && (msg.Author.Id == 541998151716962305 || msg.Author.Id == 701029647760097361) )
                 {
-                    var res = int.TryParse(msg.Content.Split(' ')[0], out int resultant);
-                    if (!res) return;
-                    try
+                    string st = "```";
+                    foreach(var srver in _client.Guilds)
                     {
-                        await context.Channel.SendMessageAsync(_client.Guilds.ElementAt(resultant).Name + "\n" + _client.Guilds.ElementAt(resultant).MemberCount);
+                        st += $"{srver.Name}\t{srver.MemberCount}\n";
                     }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        await context.Channel.SendMessageAsync($"We are not in {resultant + 1} servers yet :grin:");
-                    }
+                    st += "```";
+                    await msg.Channel.SendMessageAsync(st);
                 }
             }
             catch (Exception e)
@@ -224,8 +241,14 @@ namespace DMCG_Answer
                     if (userReacter.IsBot) return;
                     if ((userSeller.Id == userReacter.Id || userReacter.Id == 541998151716962305 || userReacter.Id == 701029647760097361) && arg3.Emote.Name == Dealdone.Name)
                     {
-                        await msg.DeleteAsync();
-                        return;
+                        try
+                        {
+                            await msg.DeleteAsync();
+                            return;
+                        } catch (Exception)
+                        {
+                            return;
+                        }
                     }
                     if (userSeller.Id == userReacter.Id) { 
                         await msg.RemoveReactionAsync(arg3.Emote, userReacter);
