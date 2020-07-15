@@ -6,7 +6,7 @@
 Just add a file called token.txt with your token for replication, in the folder printed when you run it.    
 *I have tried to make the code understandable, but as of now it isn't as detailed and commented as it should be...*   
 ### [Invite link for Trade Memer](https://bots.ondiscord.xyz/bots/722732239376613406)     
-*Invite the bot for an awesome trading system!!!*     
+*Invite the bot for an awesome trading system!!!*      
 ### [Invite link for support server!](https://discord.gg/XSkKyZ9)       
 *This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
 ### Setup for server     
