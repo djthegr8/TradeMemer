@@ -9,7 +9,7 @@ Just add a file called token.txt with your token for replication, in the folder 
 *Invite the bot for an awesome trading system!!!*     
 ### [Invite link for support server!](https://discord.gg/XSkKyZ9)       
 *This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
-### Setup for server    
+### Setup for server     
 Although the bot is capable of making a new channel when given permissions to do so, however if you don't want to give admin/Manage Channels perms, you should make a channel called *marketplace* (case insensitive) which will be where the bot embeds will be printed.   
 ### Trading Commands     
 #### 1. !trade (quantity: integer) (item: string) (price/barter-item: string)
