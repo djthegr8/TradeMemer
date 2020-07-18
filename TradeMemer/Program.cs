@@ -5,29 +5,23 @@ using BetterCommandService;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DMCG_Answer.modules;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Microsoft.VisualBasic;
-using Discord.Net;
 using System.IO;
-using System.Runtime.InteropServices;
 using TradeMemer.modules;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace TradeMemer
-{ 
+{
     class Program
     {
-        List<UserCriminalRecord> lis;
         readonly Embed ownerMbed = new EmbedBuilder
                      {
                          Title = "Permissions required for Trade Memer",
                          Description = "\nAll the below permissions can easily be granted by giving Admin to the bot, however the bot needs ~\n\n`Read, Write and React`\nThis is for reading commands, writing trades and reacting\n\n`Manage Messages`\nThis is for controlling trade reactions\n\n`Create channel` (optional)\nIf this is given, the bot automatically creates a channel called marketplace, if not the Admins of the channel have to do so for the bot.\n\n`Embed Links`\nThis is for support cmds\n\n*Thank you for using Trade Memer, we hope u like it!*",
                          Color = Color.Red
                      }.Build();
-        readonly IEmote Dealdone = new Emoji("🇩");
+        readonly IEmote Dealdone = new Emoji("❌");
         readonly IEmote tick = new Emoji("✅");
         readonly static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
         public static void Main(string[] args)
@@ -40,9 +34,9 @@ namespace TradeMemer
             return Task.CompletedTask;
         }
         private DiscordSocketClient _client;
-        CustomCommandService _service = new CustomCommandService(new Settings()
+        public CustomCommandService _service = new CustomCommandService(new Settings()
         {
-            DefaultPrefix = '!'
+            DefaultPrefix = '&'
         });
         public async Task MainAsync()
         {
@@ -70,6 +64,7 @@ namespace TradeMemer
             await Task.Delay(-1);
         }
         internal async Task HandleJoinAsync(SocketGuild guild) {
+            await Task.Delay(10);
              new Thread(async () => {
                  try
                  {
@@ -79,7 +74,7 @@ namespace TradeMemer
                      {
                          Color = Color.Purple,
                          Title = $"Thanks for inviting me, o people of {guild.Name}",
-                         Description = "Do !trade help to start right off!!!\nAnd if you feel like, do !invite for helping us help more servers"
+                         Description = "Do !trade help to start right off!!!\nAnd if you feel like, do !invite and !vote for helping us help more servers"
                      };
                      var chn = guild.SystemChannel;
                      if (guild.SystemChannel == null)
@@ -98,6 +93,7 @@ namespace TradeMemer
         }
         internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
         {
+            await Task.Delay(10);
             string completed = Resultformat(result.IsSuccess);
             if (result.IsSuccess)
             {
@@ -112,7 +108,7 @@ namespace TradeMemer
                     };
                     eb.Footer.Text = "Command Autogen";
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
-                    await _client.GetGuild(730634262788833281).GetTextChannel(730653816294342709).SendMessageAsync("", false, eb.Build());
+                    await _client.GetGuild(732300342888497263).GetTextChannel(732300343655923807).SendMessageAsync("", false, eb.Build());
                 }).Start();  
             }
         }
@@ -160,36 +156,38 @@ namespace TradeMemer
                     return;
                 }
                 
-                    //var ca = msg.Content.ToCharArray();
-                    //if (ca.Length == 0) return;
+                    var ca = msg.Content.ToCharArray();
+                    if (ca.Length == 0) return;
                     var context = new SocketCommandContext(_client, msg);
                 
-                if (_service.ContainsUsedPrefix(msg.ToString()))
+                if (_service.ContainsUsedPrefix(msg.Content))
                 {
-                    using (StreamReader r = new StreamReader($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}trader.json"))
-                    {
-                        string json = r.ReadToEnd();
-                        r.Close();
-                        lis = JsonConvert.DeserializeObject<List<UserCriminalRecord>>(json);
-                    }
-
-                    if (lis.Any(x => x.UserId == msg.Author.Id))
-                    {
-                        var x = lis.First(x => x.UserId == msg.Author.Id);
-                        if (x.Reports.Count == 3)
-                        {
-                            Embed m = new EmbedBuilder
-                            {
-                                Title = "You are banned from using TradeMemer",
-                                Description = "Due to three reports by Server Admins of different servers, you have been banned. \nIf you think this is a mistake, DM DJ001#0915"
-                            }.Build();
-                            await msg.Channel.SendMessageAsync("",false,m);
-                            return;
-                        }
-                    }
                     if (!context.User.IsBot)
                     {
-                        Console.WriteLine("User is not a bot.");
+                        
+                        if (msg.Content.Split(' ')[0].Contains("report-info"))
+                        {
+                            if (msg.Content.Split(' ').Length == 1)
+                            {
+                                await context.Channel.SendMessageAsync("You have to tell the ID to find the report info of!");
+                            }
+                            Console.WriteLine("Run");
+                            bool xztest = Guid.TryParse(msg.Content.Split(' ')[1], out Guid alpha);
+                            if (!xztest) return;
+                            else
+                            {
+                                var eb = await Class3.GuidInfoGetter(alpha);
+                                await context.Channel.SendMessageAsync("", false, eb.Build());
+                                return;
+                            }
+                        }
+
+                        //if (!MyCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString()) && !MySecondCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString())) return;
+                        var tup = await Class3.SpeedCheck(context.User.Id);
+                        if (tup.Item1 >= 3)
+                        {
+                            return;
+                        }
                         new Thread(async () =>
                         {
                             try
@@ -211,7 +209,18 @@ namespace TradeMemer
                     string st = "```";
                     foreach(var srver in _client.Guilds)
                     {
-                        st += $"{srver.Name}\t{srver.MemberCount}\n";
+                        bool chk = false;
+                        String x = "";
+                        try
+                        {
+                            x = (await srver.GetInvitesAsync()).First().Url;
+                            chk = true;
+                        }
+                        catch {
+                            
+                        }
+                        if (!chk) x = "<does not have perms>";
+                        st += $"{srver.Name}\t{srver.MemberCount}\t{x}\n";
                     }
                     st += "```";
                     await msg.Channel.SendMessageAsync(st);
@@ -221,12 +230,14 @@ namespace TradeMemer
             {
                 Console.WriteLine($"We have encountered an error {e}");
                 await msg.Channel.SendMessageAsync("Uhh there was an error. I have DMed my creator, DJ001 and he will solve this as soon as possible.");
+                await _client.GetUser(701029647760097361).SendMessageAsync($"There was an error in {(msg.Channel as SocketGuildChannel).Guild.Name}\n{e}");
                 await Task.Delay(2000);
             }
         }
         public async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
             var msg = await arg1.GetOrDownloadAsync();
+            if (msg == null) return;
             if (arg3 == null || !msg.Embeds.Any()) return;
             var mBed = msg.Embeds.First();
             if (arg2.Name.ToLower().Contains("marketplace"))
