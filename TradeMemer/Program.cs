@@ -36,7 +36,7 @@ namespace TradeMemer
         private DiscordSocketClient _client;
         public CustomCommandService _service = new CustomCommandService(new Settings()
         {
-            DefaultPrefix = '&'
+            DefaultPrefix = '!'
         });
         public async Task MainAsync()
         {
@@ -209,18 +209,7 @@ namespace TradeMemer
                     string st = "```";
                     foreach(var srver in _client.Guilds)
                     {
-                        bool chk = false;
-                        String x = "";
-                        try
-                        {
-                            x = (await srver.GetInvitesAsync()).First().Url;
-                            chk = true;
-                        }
-                        catch {
-                            
-                        }
-                        if (!chk) x = "<does not have perms>";
-                        st += $"{srver.Name}\t{srver.MemberCount}\t{x}\n";
+                        st += $"{srver.Name}\t{srver.MemberCount}\n";
                     }
                     st += "```";
                     await msg.Channel.SendMessageAsync(st);
