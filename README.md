@@ -7,7 +7,7 @@ Just add a file called token.txt with your token for replication, in the folder 
 *I have tried to make the code understandable, but as of now it isn't as detailed and commented as it should be...*   
 ### [Invite link for Trade Memer](https://bots.ondiscord.xyz/bots/722732239376613406)     
 *Invite the bot for an awesome trading system!!!*      
-### [Invite link for support server!](https://discord.gg/XSkKyZ9)       
+### [Invite link for support server!](https://discord.gg/6UBr6P2)       
 *This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
 ### Setup for server     
 Although the bot is capable of making a new channel when given permissions to do so, however if you don't want to give admin/Manage Channels perms, you should make a channel called *marketplace* (case insensitive) which will be where the bot embeds will be printed.   
