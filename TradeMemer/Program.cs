@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BetterCommandService;
+using Public_Bot;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -24,6 +24,7 @@ namespace TradeMemer
         readonly IEmote Dealdone = new Emoji("❌");
         readonly IEmote tick = new Emoji("✅");
         readonly static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
+        public static string token = File.ReadAllLines(fpath)[0];
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -57,7 +58,7 @@ namespace TradeMemer
 
             _client.LatencyUpdated += StatusUpdateAsync;
             Console.WriteLine(fpath);
-            var token = File.ReadAllLines(fpath)[0];
+            
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
             await _client.SetGameAsync("!trade help",null,ActivityType.Playing);
@@ -91,8 +92,9 @@ namespace TradeMemer
                  }
             }).Start();
         }
-        internal async Task HandleCommandResult(ICommandResult result, SocketUserMessage msg)
+        internal async Task HandleCommandResult(CommandStatus result, SocketUserMessage msg)
         {
+            /*
             await Task.Delay(10);
             string completed = Resultformat(result.IsSuccess);
             if (result.IsSuccess)
@@ -110,7 +112,7 @@ namespace TradeMemer
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
                     await _client.GetGuild(732300342888497263).GetTextChannel(732300343655923807).SendMessageAsync("", false, eb.Build());
                 }).Start();  
-            }
+            }*/
         }
         internal async Task StatusUpdateAsync(int arg1, int arg2)
         {
@@ -159,27 +161,24 @@ namespace TradeMemer
                     var ca = msg.Content.ToCharArray();
                     if (ca.Length == 0) return;
                     var context = new SocketCommandContext(_client, msg);
-                
-                if (_service.ContainsUsedPrefix(msg.Content))
+                var prefu = await Class3.PrefixGetter(context.Guild.Id);
+                Console.WriteLine($"reached bp, prefix is {prefu}");
+                if (msg.MentionedUsers.Any(x => x.Id == _client.CurrentUser.Id))
                 {
+                    await context.Message.Channel.SendMessageAsync($"Hey trader!\nMy prefix in dis server is {prefu}");
+                    return;
+                }
+                Console.WriteLine($"Reached the other saideee {msg.Content.Substring(0,prefu.Length)} == {prefu}");
+                if (msg.Content.Substring(0, prefu.Length) == prefu)
+                {
+                    Console.WriteLine("Copy that prefix");
                     if (!context.User.IsBot)
                     {
-                        
-                        if (msg.Content.Split(' ')[0].Contains("report-info"))
+                        Console.WriteLine("nobot");
+                        if (msg.Content.Split(' ')[0].Contains("my-report"))
                         {
-                            if (msg.Content.Split(' ').Length == 1)
-                            {
-                                await context.Channel.SendMessageAsync("You have to tell the ID to find the report info of!");
-                            }
-                            Console.WriteLine("Run");
-                            bool xztest = Guid.TryParse(msg.Content.Split(' ')[1], out Guid alpha);
-                            if (!xztest) return;
-                            else
-                            {
-                                var eb = await Class3.GuidInfoGetter(alpha);
-                                await context.Channel.SendMessageAsync("", false, eb.Build());
-                                return;
-                            }
+                            await _service.ExecuteAsync(context,prefu);
+                            return;
                         }
 
                         //if (!MyCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString()) && !MySecondCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString())) return;
@@ -192,9 +191,9 @@ namespace TradeMemer
                         {
                             try
                             {
-                                var result = await _service.ExecuteAsync(context);
-                                Console.WriteLine(context.User.Username + ": " + result.Result + " in channel " + context.Channel.Name + " of guild " + context.Guild.Name);
-                                await HandleCommandResult(result, msg);
+                                Console.WriteLine(await Class3.PrefixGetter(context.Guild.Id)); 
+                                await _service.ExecuteAsync(context,await Class3.PrefixGetter(context.Guild.Id));
+                                Console.WriteLine(context.User.Username + ": " + msg + " in channel " + context.Channel.Name + " of guild " + context.Guild.Name);
                             }
                             catch (Exception)
                             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using BetterCommandService;
+using static Public_Bot.CustomCommandService;
+using Public_Bot;
 using Discord;
 using Newtonsoft.Json;
 using System.IO;
@@ -11,7 +12,7 @@ using Discord.WebSocket;
 namespace TradeMemer.modules
 {
 
-    [DiscordCommandClass()]
+    [DiscordCommandClass("Reporter","Class for reporting users")]
     public class MySecondCommandClass : CommandModuleBase
     {
         /*[DiscordCommand("sqltest")]
@@ -35,7 +36,7 @@ namespace TradeMemer.modules
                 await ReplyAsync("You arent allowed to report dude");
                 return;
             }
-            if (!Context.Message.MentionedUserIds.Any())
+            if (!(Context.Message as IUserMessage).MentionedUserIds.Any())
             {
                 if (ulong.TryParse(args[0], out ulong test))
                 {
@@ -49,12 +50,12 @@ namespace TradeMemer.modules
             }
             else
             {
-                reportedId = Context.Message.MentionedUserIds.First();
+                reportedId = (Context.Message as IUserMessage).MentionedUserIds.First();
             }
             IUser rA;
             try
             {
-                rA = await Context.Client.GetUserAsync(reportedId);
+                rA = await (Context.Client as IDiscordClient).GetUserAsync(reportedId);
             }
             catch
             {
@@ -103,7 +104,7 @@ namespace TradeMemer.modules
         public async Task DiscordProfileGetSQL(params string[] _args)
         {
             ulong uzer;
-            if (!Context.Message.MentionedUserIds.Any())
+            if (!(Context.Message as IUserMessage).MentionedUserIds.Any())
             {
                 if (ulong.TryParse(_args[0], out ulong test))
                 {
@@ -117,7 +118,7 @@ namespace TradeMemer.modules
             }
             else
             {
-                uzer = Context.Message.MentionedUserIds.First();
+                uzer = (Context.Message as IUserMessage).MentionedUserIds.First();
             }
             Tuple<int, DateTimeOffset?> x = await Class3.CheckUsr(uzer);
             if (x.Item1 != 0)

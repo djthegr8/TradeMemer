@@ -122,7 +122,7 @@ namespace TradeMemer.modules
             X.AddField("Time", $"This report was done on {Time4Stuff.Day}-{Time4Stuff.Month}-{Time4Stuff.Year}");
             return X; 
         }
-        public static async Task<char> PrefixGetter(ulong GuilID)
+        public static async Task<string> PrefixGetter(ulong GuilID)
         {
             using var con = new SqliteConnection(fph);
             await con.OpenAsync();
@@ -131,8 +131,8 @@ namespace TradeMemer.modules
             cmd.CommandText = $"select Prefix from prefixes where guildid = {GuilID}";
             var read = await cmd.ExecuteReaderAsync();
             await read.ReadAsync();
-            if (!read.HasRows) return '!';
-            var pref = read.GetChar(0);
+            if (!read.HasRows) return "!";
+            var pref = read.GetString(0);
             await read.CloseAsync();
             await con.CloseAsync();
             return pref;

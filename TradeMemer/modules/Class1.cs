@@ -1,4 +1,4 @@
-﻿using BetterCommandService;
+﻿using static Public_Bot.CustomCommandService;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using TradeMemer.modules;
 using Newtonsoft.Json;
 using System.IO;
-
+using Public_Bot;
 
 namespace TradeMemer.modules
 {
-    [DiscordCommandClass()]
+    [DiscordCommandClass("general","Class with all the stuff")]
     public class MyCommandClass : CommandModuleBase
     {
         readonly Random regret = new Random();
@@ -164,7 +164,7 @@ namespace TradeMemer.modules
                 Description = sug + "\n" + $"*Given by {Context.User.Username}#{Context.User.Discriminator}*",
                 Title = $"**New bot suggestion from **{Context.Guild.Name}"
             };
-            var tM = await Context.Client.GetGuildAsync(730634262788833281);
+            var tM = await (Context.Client as IDiscordClient).GetGuildAsync(730634262788833281);
             var sugChan = await tM.GetChannelAsync(730700586135322636) as SocketTextChannel;
             await sugChan.SendMessageAsync("", false, mBed.Build());
             await Task.Delay(2000);
@@ -179,6 +179,12 @@ namespace TradeMemer.modules
         public async Task PrefixUpd(char x)
         {
             await Class3.PrefixAdder(Context.Guild.Id, x);
+            EmbedBuilder f = new EmbedBuilder
+            {
+                Title = "Prefix Changed Successfully!",
+                Description = $"The bot prefix has successfully been changed to {x}"
+            };
+            await ReplyAsync("", false, f.Build());
         }
         //Below are supporter functions, not really commands.
         
