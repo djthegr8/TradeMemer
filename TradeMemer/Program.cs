@@ -7,9 +7,11 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Reflection;
 using System.IO;
 using TradeMemer.modules;
 using System.Collections.Generic;
+using Microsoft.VisualBasic;
 
 namespace TradeMemer
 {
@@ -92,9 +94,8 @@ namespace TradeMemer
                  }
             }).Start();
         }
-        internal async Task HandleCommandResult(CommandStatus result, SocketUserMessage msg)
-        {
-            /*
+        internal async Task HandleCommandResult(CustomCommandService.ICommandResult result, SocketUserMessage msg, string prefi)
+        { 
             await Task.Delay(10);
             string completed = Resultformat(result.IsSuccess);
             if (result.IsSuccess)
@@ -105,14 +106,14 @@ namespace TradeMemer
                     {
                         Color = Color.Green,
                         Title = "**Command Log**",
-                        Description = $"The Command {msg.Content.Split(' ').First()} was used in {msg.Channel.Name} of {(msg.Channel as SocketTextChannel).Guild.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}",
+                        Description = $"The Command {msg.Content.Substring(prefi.Length)} was used in {msg.Channel.Name} of {(msg.Channel as SocketTextChannel).Guild.Name} by {msg.Author.Username + "#" + msg.Author.Discriminator} \n\n **Full Message** \n `{msg.Content}`\n\n **Result** \n {completed}",
                         Footer = new EmbedFooterBuilder()
                     };
                     eb.Footer.Text = "Command Autogen";
                     eb.Footer.IconUrl = _client.CurrentUser.GetAvatarUrl();
                     await _client.GetGuild(732300342888497263).GetTextChannel(732300343655923807).SendMessageAsync("", false, eb.Build());
                 }).Start();  
-            }*/
+            }
         }
         internal async Task StatusUpdateAsync(int arg1, int arg2)
         {
@@ -161,14 +162,13 @@ namespace TradeMemer
                     var ca = msg.Content.ToCharArray();
                     if (ca.Length == 0) return;
                     var context = new SocketCommandContext(_client, msg);
-                var prefu = await Class3.PrefixGetter(context.Guild.Id);
-                Console.WriteLine($"reached bp, prefix is {prefu}");
+                var prefu = await SqliteClass.PrefixGetter(context.Guild.Id);
                 if (msg.MentionedUsers.Any(x => x.Id == _client.CurrentUser.Id))
                 {
                     await context.Message.Channel.SendMessageAsync($"Hey trader!\nMy prefix in dis server is {prefu}");
                     return;
                 }
-                Console.WriteLine($"Reached the other saideee {msg.Content.Substring(0,prefu.Length)} == {prefu}");
+                if (msg.Content.Length <= prefu.Length) return;
                 if (msg.Content.Substring(0, prefu.Length) == prefu)
                 {
                     Console.WriteLine("Copy that prefix");
@@ -182,7 +182,7 @@ namespace TradeMemer
                         }
 
                         //if (!MyCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString()) && !MySecondCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString())) return;
-                        var tup = await Class3.SpeedCheck(context.User.Id);
+                        var tup = await SqliteClass.SpeedCheck(context.User.Id);
                         if (tup.Item1 >= 3)
                         {
                             return;
@@ -191,11 +191,11 @@ namespace TradeMemer
                         {
                             try
                             {
-                                Console.WriteLine(await Class3.PrefixGetter(context.Guild.Id)); 
-                                await _service.ExecuteAsync(context,await Class3.PrefixGetter(context.Guild.Id));
-                                Console.WriteLine(context.User.Username + ": " + msg + " in channel " + context.Channel.Name + " of guild " + context.Guild.Name);
+                                var x = await _service.ExecuteAsync(context,prefu);
+                                await HandleCommandResult(x, msg, prefu);
+                                Console.WriteLine(context.User.Username + ": " + x.Result + " in channel " + context.Channel.Name + " of guild " + context.Guild.Name);
                             }
-                            catch (Exception)
+                            catch (Discord.Net.HttpException)
                             {
                                 await context.Guild.Owner.SendMessageAsync("I do not have perms!!! Please give them to me!");
                             }
@@ -238,6 +238,11 @@ namespace TradeMemer
                     var userIDReacter = arg3.UserId;
                     var userReacter = await arg2.GetUserAsync(userIDReacter);
                     if (userReacter.IsBot) return;
+                    var tup = await SqliteClass.SpeedCheck(userIDReacter);
+                    if (tup.Item1 >= 3)
+                    {
+                        return;
+                    }
                     if ((userSeller.Id == userReacter.Id || userReacter.Id == 541998151716962305 || userReacter.Id == 701029647760097361) && arg3.Emote.Name == Dealdone.Name)
                     {
                         try
@@ -249,7 +254,7 @@ namespace TradeMemer
                             return;
                         }
                     }
-                    if (userSeller.Id == userReacter.Id) { 
+                    if (userSeller.Id == userReacter.Id || (await SqliteClass.SpeedCheck(userIDReacter)).Item1 >= 3) { 
                         await msg.RemoveReactionAsync(arg3.Emote, userReacter);
                         return;
                     }

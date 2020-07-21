@@ -32,5 +32,12 @@ namespace TradeMemer.modules
             IDblBot me = await DblApi.GetMeAsync();
             return await DblApi.HasVoted(ide);
         }
+        [DiscordCommand("guildupd")]
+        public async Task topGGUPD()
+        {
+            if (Context.User.Id != 701029647760097361) return;
+            IDblSelfBot me = await DblApi.GetMeAsync();
+            await me.UpdateStatsAsync(Context.Client.Guilds.Count);
+        }
     }
 }

@@ -21,9 +21,11 @@ namespace TradeMemer.modules
         {
             Title = "**Trade Memer help**"
         }
-        .AddField("Trading Commands", "``!trade`` is the command for putting a sale \n`!trade [quantity] [itemname] [price]`\nExample - !trade 12 banknotes 20k\nWhile ``!buying`` is the command for requesting a trade\nExample - !buying 2 pepe 60000\nReact with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :x: to declare the deal as closed.\n\n")
-        .AddField("Secure-trade Commands", "`!profile` - This command allows you to check the past warns of the trader.\n`!profile [mention/id]`\nExample - !profile @DJ001\n`!my-reports` - Get details of your past warns.\n`trade-report`(Admins only) - Report scammers.You can report a scammer only once in 1 server.\n`!trade-report [@scammmer or ID] [optional reason]`\nExample - !trade-report @DJ001\n`!appeal` - If you feel you are warned or banned falsely then you can appeal here with proof.\n\n")
-        .AddField("Non trading commands", "`idea` - Help us in making trade better by sharing your unique suggestions with us.\nExample - !idea my suggestion is make bot better\n`!vote` - Motivate us for making trade better by voting the bot.\n`!ping` - Allows you to check the speed of bot.\n\n")
+        .AddField("Trading Mechanism", "React with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :x: to declare the deal as closed.\n\n")
+        .AddField("Trading Commands", "1.``!trade``\n2.``!buying``\n\n")
+        .AddField("Non trading commands", "1.`!prefix`\n2.`!idea`\n3.`!vote`\n4.`!ping`\n\n")
+        .AddField("Secure-trade Commands", "1.`!profile`\n2.`!my-reports`\n3.`!trade-report`(Admins only)\n4.`!appeal`\n\n")
+        .AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin)")
         .Build();
         readonly Embed buyError = new EmbedBuilder
         {
@@ -52,7 +54,13 @@ namespace TradeMemer.modules
             }
         };
 
-        [DiscordCommand("buying")]
+        [DiscordCommand("buying",
+            description ="This command is for requesting people to sell the item you are wishing to buy.",
+            commandHelp ="buying [quantity] [itemname] [price-each/barter]",
+            example ="buying 10 pepe 2m"
+            )]
+        [Alt("b")]
+        [Alt("buy")]
         public async Task BuyCommand(uint quantity, string item, string price)
         {
             if (quantity == 0 || item == "")
@@ -67,12 +75,16 @@ namespace TradeMemer.modules
             //}
             bool isTrader;
             (price, isTrader) = await Preprocess(price);
-            SocketCommandContext truContext = Context as SocketCommandContext;
+            SocketCommandContext truContext = Context;
             ulong chnlId = await SearchChannel(truContext);
             if (chnlId == 1)
             {
                 return;
             }
+            var chnl = truContext.Guild.GetTextChannel(chnlId);
+            if (isTrader) await ReplyAsync($"Your buyer's request of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
+            else await ReplyAsync($"Your barter request of {quantity} {item} for {price} has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
+            await Bleh(Context);
             EmbedBuilder eb = new EmbedBuilder
             {
                 Title = $"**{item.ToUpper()}** in demand!",
@@ -82,15 +94,18 @@ namespace TradeMemer.modules
             if (isTrader) eb.Description = $"{Context.User.Mention} wants to buy **{quantity} {item} ** and is willing to pay {price} each";
             else eb.Description = $"{Context.User.Mention} wants to buy **{quantity} {item} ** and is willing to barter {price}";
             eb.Footer.Text = "Made with ❤️ by TradeMemer";
-            var chnl = truContext.Guild.GetTextChannel(chnlId);
             var res = await chnl.SendMessageAsync(chn, false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
             await res.AddReactionAsync(new Emoji("❌"));
-            if (isTrader) await ReplyAsync($"Your buyer's request of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
-            else await ReplyAsync($"Your barter request of {quantity} {item} for {price} has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
-            await Bleh(Context);
         }
-        [DiscordCommand("trade")]
+        [DiscordCommand("trade",
+            description ="This is the command for placing an item for sale.",
+            commandHelp ="trade [quantity] [itemname] [price-each/barter]",
+            example ="trade 5 fish 5.1k"
+            )]
+        [Alt("s")]
+        [Alt("sell")]
+        [Alt("selling")]
         public async Task TradeCommand(uint quantity, string item, string price)
         {
             if (quantity == 0 || item == "")
@@ -129,7 +144,7 @@ namespace TradeMemer.modules
             await NoArgTrade();
         }
 
-        [DiscordCommand("ping")]
+        [DiscordCommand("ping",description ="See how fast the bot's responses are!!")]
         public async Task Ping()
         {
             await ReplyAsync($"TradePong: ``{ (Context as SocketCommandContext).Client.Latency} ms``");
@@ -149,53 +164,92 @@ namespace TradeMemer.modules
         {
             await NoArgTrade();
         }
-        [DiscordCommand("vote")]
-        public async Task Vote()
+        [DiscordCommand("vote",
+            description ="Like our bot? Vote for it on Discord Bot List!"
+            )]
+        [Alt("voting")]
+        public async Task Vote(params string[] args)
         {
             await Context.Channel.SendMessageAsync("", false, vote);
         }
-        [DiscordCommand("idea")]
+        [DiscordCommand("idea",description ="Have a suggestion to make? Use !idea to do it!")]
+        [Alt("suggest")]
+        [Alt("suggestion")]
         public async Task Idea(params string[] args)
         {
-            await ReplyAsync("Your suggestion has been sent to the Devs and i've put in a good word ;)\nAnd while you wait, join our support server!\nhttps://discord.gg/PbunDXN");
-            var sug = Context.Message.Content.Remove(0, 5);
+            await ReplyAsync("Your suggestion has been sent to the Devs and i've put in a good word ;)");
+            await Bleh(Context);
+            var sug = Context.Message.Content;
             var mBed = new EmbedBuilder
             {
                 Description = sug + "\n" + $"*Given by {Context.User.Username}#{Context.User.Discriminator}*",
                 Title = $"**New bot suggestion from **{Context.Guild.Name}"
             };
-            var tM = await (Context.Client as IDiscordClient).GetGuildAsync(730634262788833281);
-            var sugChan = await tM.GetChannelAsync(730700586135322636) as SocketTextChannel;
+            var tM = await (Context.Client as IDiscordClient).GetGuildAsync(732300342888497263);
+            var sugChan = await tM.GetChannelAsync(734634237772431490) as SocketTextChannel;
             await sugChan.SendMessageAsync("", false, mBed.Build());
             await Task.Delay(2000);
         }
-        [DiscordCommand("invite")]
+        [DiscordCommand("invite",description ="Invite the bot to your server!")]
         public async Task Me(params string[] args)
         {
             invite.ImageUrl = Context.Client.CurrentUser.GetAvatarUrl();
             await ReplyAsync("", false, invite.Build());
         }
-        [DiscordCommand("prefix")]
-        public async Task PrefixUpd(char x)
+        [DiscordCommand("prefix",description ="Change the bot's prefix here!",commandHelp ="prefix &")]
+        public async Task PrefixUpd(string x)
         {
-            await Class3.PrefixAdder(Context.Guild.Id, x);
+            await SqliteClass.PrefixAdder(Context.Guild.Id, x);
             EmbedBuilder f = new EmbedBuilder
             {
                 Title = "Prefix Changed Successfully!",
-                Description = $"The bot prefix has successfully been changed to {x}"
+                Description = $"The bot prefix has successfully been changed to {x}",
+                ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl()
             };
             await ReplyAsync("", false, f.Build());
+        }
+        [DiscordCommand("help")]
+        public async Task Helper(string cmd)
+        {
+            if (!Commands.Any(x => (x.CommandName.ToLower() == cmd.ToLower() || x.Alts.Any(x => x.ToLower() == cmd.ToLower())) && x.CommandDescription != ""))
+            {
+                var d = new EmbedBuilder
+                {
+                    Title = "Command not found",
+                    Description = $"The command {cmd} was not found!",
+                    Footer = new EmbedFooterBuilder()
+                };
+                d.Footer.Text = "Help Command by Trade Memer";
+                d.Footer.Build();
+                await ReplyAsync("", embed: d.Build());
+            } else
+            {
+                var prefixure = await SqliteClass.PrefixGetter(Context.Guild.Id);
+                var commandSelected = Commands.First(x => (x.CommandName.ToLower() == cmd.ToLower() || x.Alts.Any(x => x.ToLower() == cmd.ToLower())) && x.CommandDescription != "");
+                var aliasStr = prefixure + string.Join($", {prefixure}", commandSelected.Alts);
+                var embeds = new EmbedBuilder();
+                embeds.AddField("Command", prefixure + commandSelected.CommandName + '\t');
+                embeds.AddField("Description", commandSelected.CommandDescription, true);
+                if (!string.IsNullOrEmpty(commandSelected.CommandHelpMessage)) embeds.AddField("Usage", $"`{prefixure}{commandSelected.CommandHelpMessage}`");
+                if (!string.IsNullOrEmpty(commandSelected.example)) embeds.AddField("Example", $"`{prefixure}{commandSelected.example}`");
+                if (commandSelected.Alts.Count > 0) embeds.AddField("Aliases", aliasStr);
+                embeds.AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin)");
+                embeds.Footer = new EmbedFooterBuilder { Text = "Help Command by Trade Memer" };
+                await ReplyAsync("", false, embeds.Build());
+            }
         }
         //Below are supporter functions, not really commands.
         
         public async Task Bleh(ICommandContext context)
         {
-            
-            if (regret.Next(0, 6) <= 3)
+            var xyz = await context.Client.GetGuildAsync(732300342888497263);
+            await xyz.DownloadUsersAsync();
+            var abc = await xyz.GetUsersAsync();
+            if (regret.Next(0, 6) <= 4)
             {
                 if (regret.Next(0, 10) > 5)
                 {
-                    if ((context.User as SocketGuildUser).MutualGuilds.Any(x => x.Id == 732300342888497263)) return;
+                    if (abc.Any(x => x.Id == context.User.Id)) return;
                     await ReplyAsync("While you wait for a someone to see your deal, why not join our supercool support server!\nhttps://discord.gg/PbunDXN");
                 }
                 else

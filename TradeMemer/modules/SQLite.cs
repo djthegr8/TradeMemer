@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 namespace TradeMemer.modules
 {
-    class Class3
+    class SqliteClass
     {
         /*public static SqliteCommand Connect()
         {
@@ -137,13 +137,13 @@ namespace TradeMemer.modules
             await con.CloseAsync();
             return pref;
         }
-        public static async Task PrefixAdder(ulong GuLDID, char prefix)
+        public static async Task PrefixAdder(ulong GuLDID, string prefix)
         {
             using var con = new SqliteConnection(fph);
             await con.OpenAsync();
             using var cmd = new SqliteCommand();
             cmd.Connection = con;
-            cmd.CommandText = $"replace into prefixes (guildid,Prefix) values ({GuLDID},'{prefix}');";
+            cmd.CommandText = $"replace into prefixes (guildid,Prefix) values ({GuLDID},\"{prefix}\");";
             await cmd.ExecuteNonQueryAsync();
             return;
         }

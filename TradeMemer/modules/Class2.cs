@@ -22,11 +22,11 @@ namespace TradeMemer.modules
             Console.WriteLine(tryer);
             Class3.Bla(tryer);
         }*/
-        [DiscordCommand("trade-report")]
+        [DiscordCommand("trade-report",description ="Reports the mentioned user for given reason and scamming",commandHelp ="trade-report [id/mention] [reason]",example = "trade-report @Scammer liar")]
         public async Task SqlTest(params string[] args)
         {
             ulong reportedId;
-            if ((Context.Guild as SocketGuild).MemberCount < 25 && (Context.Guild.Id != 732300342888497263 && (Context.Channel.Id != 732300343655923811 || Context.Channel.Id != 732300344138399855)))
+            if ((Context.Guild).MemberCount < 25 && (Context.Guild.Id != 732300342888497263 && (Context.Channel.Id != 732300343655923811 || Context.Channel.Id != 732300344138399855)))
             {
                 await ReplyAsync("Due to prevention of scam reports, we only allow reports from servers with above 25 people.");
                 return;
@@ -70,11 +70,11 @@ namespace TradeMemer.modules
             string x;
             string y;
             if (args.Length < 2) {
-                x = await Class3.Bla(reportedId, Context.Guild.Id, Context.User.Id, DateTime.UtcNow);
+                x = await SqliteClass.Bla(reportedId, Context.Guild.Id, Context.User.Id, DateTime.UtcNow);
                 y = "bad trading/scamming";
             }
             else {
-                x = await Class3.Bla(reportedId, Context.Guild.Id, Context.User.Id, DateTime.UtcNow, args[1]);
+                x = await SqliteClass.Bla(reportedId, Context.Guild.Id, Context.User.Id, DateTime.UtcNow, args[1]);
                 y = string.Join(' ',args.Skip(1));
             }
             if (x == "E")
@@ -100,7 +100,7 @@ namespace TradeMemer.modules
             await rA.SendMessageAsync($"You were reported for {y} by {Context.User.Username}{Context.User.Discriminator} in the server {Context.Guild.Name}\nTo appeal, u can go to https://forms.gle/gvcDFsqwqxCMr7dR7");
 
         }
-        [DiscordCommand("profile")]
+        [DiscordCommand("profile",description ="Shows the previous reports of mentioned user",commandHelp ="profile [id/mention]",example = "profile @trader")]
         public async Task DiscordProfileGetSQL(params string[] _args)
         {
             ulong uzer;
@@ -120,7 +120,7 @@ namespace TradeMemer.modules
             {
                 uzer = (Context.Message as IUserMessage).MentionedUserIds.First();
             }
-            Tuple<int, DateTimeOffset?> x = await Class3.CheckUsr(uzer);
+            Tuple<int, DateTimeOffset?> x = await SqliteClass.CheckUsr(uzer);
             if (x.Item1 != 0)
             {
                 await ReplyAsync($"The user mentioned has {x.Item1} warning(s), with the latest one on {x.Item2.Value}");
@@ -130,15 +130,15 @@ namespace TradeMemer.modules
                 await ReplyAsync($"The user mentioned has no warnings! They're good to trade with!");
             }
         }
-        [DiscordCommand("appeal")]
+        [DiscordCommand("appeal",description ="Gives the link for appealing against incorrect reports")]
         public async Task AppealCommand(params string[] arg)
         {
             await ReplyAsync("You may appeal at https://forms.gle/gvcDFsqwqxCMr7dR7 for any spam report!");
         }
-        [DiscordCommand("my-reports")]
+        [DiscordCommand("my-reports",description ="Shows all your reports with IDs")]
         public async Task ReportCommand(params string[] argz)
         {
-            var tup = await Class3.SpeedCheck(Context.User.Id);
+            var tup = await SqliteClass.SpeedCheck(Context.User.Id);
             if (tup.Item1 > 0)
             {
                 string rids = "";
@@ -161,7 +161,7 @@ namespace TradeMemer.modules
         public async Task Unreport(params string[] args)
         {
             if (Context.User.Id != 701029647760097361) return;
-            await Class3.UserUnreporter(args[0]);
+            await SqliteClass.UserUnreporter(args[0]);
             await ReplyAsync("Done sir.");
         }
         [DiscordCommand("sqlite")]

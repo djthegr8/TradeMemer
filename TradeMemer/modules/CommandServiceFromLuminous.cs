@@ -52,7 +52,9 @@ namespace Public_Bot
         /// If <see langword="true"/> then <see cref="Settings.HasPermissionMethod"/> will be called and checked if the user has permission to execute the command, this result will be in the <see cref="CommandModuleBase"/>
         /// </summary>
         public bool RequiredPermission { get; set; }
-
+        /// <summary>
+        /// Name of the command
+        /// </summary>
         internal string commandName;
         /// <summary>
         /// The prefix for the command. This is optional, the command will work with the default prefix you passed or an overwrited one from the <see cref="DiscordCommandClass"/>
@@ -66,6 +68,10 @@ namespace Public_Bot
         /// Command help message, use this to create a generic help message
         /// </summary>
         public string commandHelp { get; set; }
+        /// <summary>
+        /// An example of the commands' usage
+        /// </summary>
+        public string example {get; set;}
         /// <summary>
         /// If <see langword="true"/> then bots can execute the command, default is <see langword="false"/>
         /// </summary>
@@ -302,6 +308,7 @@ namespace Public_Bot
                     CommandName = cmdat.commandName,
                     CommandDescription = cmdat.description,
                     CommandHelpMessage = cmdat.commandHelp,
+                    example = cmdat.example,
                     Prefixes = parat.prefix == '\0' ? cmdobj.Prefixes : cmdobj.Prefixes.Append(parat.prefix).ToArray(),
                     RequiresPermission = cmdat.RequiredPermission,
                     ModuleName = cmdobj.parent.attribute.ModuleName,
@@ -370,11 +377,9 @@ namespace Public_Bot
                 : context.Message.Content.Split(' ');
 
             param = param.TakeLast(param.Length - 1).ToArray();
-
             string command = IsMentionCommand
                 ? context.Message.Content.Replace($"<@{context.Client.CurrentUser.Id}>", string.Empty).Replace($"<@!{context.Client.CurrentUser.Id}>", "").Trim().Split(' ')[0]
                 : context.Message.Content.Remove(0, pref.Length).Split(' ')[0];
-
             var commandobj = CommandList.Where(x => x.CommandName.ToLower() == command);
             var altob = CommandList.Where(x => x.alts.Any(x => x.ToLower() == command));
             if (commandobj.Count() == 0)
@@ -407,7 +412,6 @@ namespace Public_Bot
         }
         private async Task<CommandResult> ExecuteCommand(Command cmd, SocketCommandContext context, string[] param)
         { 
-
             if (!cmd.attribute.BotCanExecute && context.Message.Author.IsBot)
                 return new CommandResult() { Result = CommandStatus.InvalidPermissions };
             if (cmd.Paramaters.Length == 0 && param.Length == 0)
@@ -432,7 +436,6 @@ namespace Public_Bot
             }
             else if (cmd.Paramaters.Length == 0 && param.Length > 0)
                 return new CommandResult() { Result = CommandStatus.InvalidParams, IsSuccess = false };
-
             if (cmd.Paramaters.Last().GetCustomAttributes(typeof(ParamArrayAttribute), false).Length > 0)
             {
                 List<object> parsedparams = new List<object>();
@@ -576,6 +579,7 @@ namespace Public_Bot
             public string CommandDescription { get; set; }
             public string CommandHelpMessage { get; set; }
             public bool RequiresPermission { get; set; }
+            public string example { get; set; }
             public char[] Prefixes { get; set; }
             public string ModuleName { get; set; }
             public List<string> Alts { get; set; } = new List<string>();
@@ -697,6 +701,7 @@ namespace Public_Bot
         string CommandName { get; }
         string CommandDescription { get; }
         string CommandHelpMessage { get; }
+        string example { get; }
         char[] Prefixes { get; }
         bool RequiresPermission { get; }
         string ModuleName { get; }
