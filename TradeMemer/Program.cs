@@ -12,6 +12,7 @@ using System.IO;
 using TradeMemer.modules;
 using System.Collections.Generic;
 using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 
 namespace TradeMemer
 {
@@ -71,6 +72,7 @@ namespace TradeMemer
              new Thread(async () => {
                  try
                  {
+                     await _client.GetUser(701029647760097361).SendMessageAsync($"I JOINED {guild.Name}, A SERVER OF {guild.MemberCount} PEOPLE WOO!");
                      await guild.Owner.SendMessageAsync("", false, ownerMbed);
                      await Task.Delay(20000);
                      EmbedBuilder embed = new EmbedBuilder
@@ -118,7 +120,7 @@ namespace TradeMemer
         internal async Task StatusUpdateAsync(int arg1, int arg2)
         {
             ulong alusr = 0;
-            _client.Guilds.ToList().ForEach(x => alusr += (ulong)x.Users.Count);
+            _client.Guilds.ToList().ForEach(x => alusr += (ulong)x.MemberCount);
             string[] status = new string[]
             {
                 $"Trading in {_client.Guilds.Count} unique servers!",
@@ -138,6 +140,7 @@ namespace TradeMemer
                 $"Preparing for the Bot Oscars!"
             };
             await _client.SetGameAsync($"!trade help - {status[new Random().Next(0, status.Length)]}", null, ActivityType.Playing);
+            await Class4.topGGUPD(_client);
         }
         internal static string Resultformat(bool isSuccess)
         {
@@ -208,6 +211,13 @@ namespace TradeMemer
                     string st = "```";
                     foreach(var srver in _client.Guilds)
                     {
+                        /*string inv;
+                        try
+                        {
+                            inv = (await srver.GetInvitesAsync()).First().Url;
+                        }
+                        catch { inv = "No Perms LMAO!"; }*/
+                        /*st += $"{srver.Name}\t{inv}\n";*/
                         st += $"{srver.Name}\t{srver.MemberCount}\n";
                     }
                     st += "```";

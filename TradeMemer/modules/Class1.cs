@@ -13,20 +13,10 @@ using Public_Bot;
 
 namespace TradeMemer.modules
 {
-    [DiscordCommandClass("general","Class with all the stuff")]
+    [DiscordCommandClass("Trading","Class with all the stuff")]
     public class MyCommandClass : CommandModuleBase
     {
         readonly Random regret = new Random();
-        readonly Embed erroR = new EmbedBuilder
-        {
-            Title = "**Trade Memer help**"
-        }
-        .AddField("Trading Mechanism", "React with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :x: to declare the deal as closed.\n\n")
-        .AddField("Trading Commands", "1.``!trade``\n2.``!buying``\n\n")
-        .AddField("Non trading commands", "1.`!prefix`\n2.`!idea`\n3.`!vote`\n4.`!ping`\n\n")
-        .AddField("Secure-trade Commands", "1.`!profile`\n2.`!my-reports`\n3.`!trade-report`(Admins only)\n4.`!appeal`\n\n")
-        .AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin)")
-        .Build();
         readonly Embed buyError = new EmbedBuilder
         {
             Title = "**Buy Command**",
@@ -152,6 +142,18 @@ namespace TradeMemer.modules
         [DiscordCommand("trade")]
         public async Task NoArgTrade()
         {
+            var prefix = await SqliteClass.PrefixGetter(Context.Guild.Id);
+            Embed erroR = new EmbedBuilder
+            {
+                Title = "**Trade Memer help**"
+            }
+        .AddField("Trading Mechanism", $"React with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :x: to declare the deal as closed.\n\n")
+        .AddField("Trading Commands", $"1.``{prefix}trade``\n2.``{prefix}buying``\n\n")
+        .AddField("Non trading commands", $"1.`{prefix}prefix`\n2.`{prefix}idea`\n3.`{prefix}vote`\n4.`{prefix}ping`\n5. `{prefix}patch`\n")
+        .AddField("Secure-trade Commands", $"1.`{prefix}profile`\n2.`{prefix}my-reports`\n3.`{prefix}trade-report`(Admins only)\n4.`{prefix}appeal`\n\n")
+        .AddField("Command-Specific Help", $"Specific help can be received by doing `{prefix}help [cmdname]`")
+        .AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin) | [GitHub](https://tiny.cc/TMGitHub)")
+        .Build();
             await Context.Channel.SendMessageAsync("", false, erroR);
         }
         [DiscordCommand("buying")]
@@ -172,7 +174,7 @@ namespace TradeMemer.modules
         {
             await Context.Channel.SendMessageAsync("", false, vote);
         }
-        [DiscordCommand("idea",description ="Have a suggestion to make? Use !idea to do it!")]
+        [DiscordCommand("idea",description ="Have a suggestion to make? Do it here")]
         [Alt("suggest")]
         [Alt("suggestion")]
         public async Task Idea(params string[] args)
@@ -208,6 +210,7 @@ namespace TradeMemer.modules
             };
             await ReplyAsync("", false, f.Build());
         }
+
         [DiscordCommand("help")]
         public async Task Helper(string cmd)
         {
@@ -233,10 +236,36 @@ namespace TradeMemer.modules
                 if (!string.IsNullOrEmpty(commandSelected.CommandHelpMessage)) embeds.AddField("Usage", $"`{prefixure}{commandSelected.CommandHelpMessage}`");
                 if (!string.IsNullOrEmpty(commandSelected.example)) embeds.AddField("Example", $"`{prefixure}{commandSelected.example}`");
                 if (commandSelected.Alts.Count > 0) embeds.AddField("Aliases", aliasStr);
-                embeds.AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin)");
+                embeds.AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin) | [GitHub](https://tiny.cc/TMGitHub)");
                 embeds.Footer = new EmbedFooterBuilder { Text = "Help Command by Trade Memer" };
                 await ReplyAsync("", false, embeds.Build());
             }
+        }
+        [DiscordCommand("patch",
+            description ="See the update logs here!",
+            commandHelp ="patch [version-number]",
+            example ="patch 1.3"
+            )]
+        public async Task PatchFunc(double vnum)
+        {
+            EmbedBuilder x = new EmbedBuilder();
+            switch (vnum)
+            {
+                case 1.1:
+                    x.Description = "The very first Trade Memer patch!\nAll it included was trade embeds!!";
+                    break;
+                case 1.2:
+                    x.Description = "The first version to run on a RPi, was tremendously improved from v1.1 to receive Reaction based trades!";
+                    break;
+                case 1.3:
+                    x.Description = "One of the more updated versions, with all sorts of reporting features (JSON)";
+                    break;
+                case 1.4:
+                    x.Description = "1. Shifted to SQLite for better reliability\n2. Custom Prefix\n3. Professional commands.";
+                    break;
+            }
+            x.Title = "Patch Information";
+            await ReplyAsync("", embed: x.Build());
         }
         //Below are supporter functions, not really commands.
         
