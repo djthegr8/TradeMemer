@@ -145,6 +145,7 @@ namespace TradeMemer.modules
             cmd.Connection = con;
             cmd.CommandText = $"replace into prefixes (guildid,Prefix) values ({GuLDID},\"{prefix}\");";
             await cmd.ExecuteNonQueryAsync();
+            await con.CloseAsync();
             return;
         }
         public static async Task UserUnreporter(string repID)
@@ -155,6 +156,53 @@ namespace TradeMemer.modules
             cmd.Connection = con;
             cmd.CommandText = $"delete from Crims where ReportID=\"{repID}\";";
             await cmd.ExecuteNonQueryAsync();
+            await con.CloseAsync();
+            return;
+        }
+        public static async Task<bool> IsOnCooldown(ulong userID, ulong guildID)
+        {
+            using var con = new SqliteConnection(fph);
+            await con.OpenAsync();
+            using var cmd = new SqliteCommand();
+            cmd.Connection = con;
+            cmd.CommandText = $"SELECT EXISTS ( SELECT* FROM cooldown WHERE (UserId = {userID} AND GuildID = {guildID}));";
+            var outp = await cmd.ExecuteReaderAsync();
+            await outp.ReadAsync();
+            short hasOrNot = outp.GetInt16(0);
+            await outp.CloseAsync();
+            await con.CloseAsync();
+            return hasOrNot == 1;
+        }
+        public static async Task AddCooldown(ulong userID, ulong guildID)
+        {
+            using var con = new SqliteConnection(fph);
+            await con.OpenAsync();
+            using var cmd = new SqliteCommand();
+            cmd.Connection = con;
+            cmd.CommandText = $"insert into cooldown(UserId,GuildID) values({userID},{guildID});";
+            await cmd.ExecuteNonQueryAsync();
+            cmd.CommandText = $"select Cooldown FROM prefixes where guildid = {guildID};";
+            var reedr = await cmd.ExecuteReaderAsync();
+            await reedr.ReadAsync();
+            var cdmins = reedr.GetInt16(0);
+            await reedr.CloseAsync();
+            await Task.Delay(cdmins * 60000);
+            cmd.CommandText = $"delete from cooldown where(UserId={userID} AND GuildID={guildID});";
+            await cmd.ExecuteNonQueryAsync();
+            await con.CloseAsync();
+            return;
+        }
+        public static async Task EditCoolDOWN(ulong guildID, int mins)
+        {
+            using var con = new SqliteConnection(fph);
+            await con.OpenAsync();
+            using var cmd = new SqliteCommand();
+            cmd.Connection = con;
+            cmd.CommandText = $"replace into prefixes(guildid,Cooldown) values({guildID},{mins});";
+            await cmd.ExecuteNonQueryAsync();
+            cmd.CommandText = $"delete from cooldown where GuildID={guildID}";
+            await cmd.ExecuteNonQueryAsync();
+            await con.CloseAsync();
             return;
         }
     }

@@ -26,7 +26,7 @@ namespace TradeMemer
                      }.Build();
         readonly IEmote Dealdone = new Emoji("❌");
         readonly IEmote tick = new Emoji("✅");
-        readonly static string fpath = Directory.GetCurrentDirectory() + "" + "/token.txt";
+        readonly static string fpath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "token.txt";
         public static string token = File.ReadAllLines(fpath)[0];
         public static void Main(string[] args)
         {
@@ -183,7 +183,6 @@ namespace TradeMemer
                             await _service.ExecuteAsync(context,prefu);
                             return;
                         }
-
                         //if (!MyCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString()) && !MySecondCommandClass.Commands.Any(x => x.CommandName == msg.Content.Skip(1).ToString())) return;
                         var tup = await SqliteClass.SpeedCheck(context.User.Id);
                         if (tup.Item1 >= 3)

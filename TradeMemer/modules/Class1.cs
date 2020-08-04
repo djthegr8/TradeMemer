@@ -63,6 +63,12 @@ namespace TradeMemer.modules
             //{
             //    chn = Context.Guild.GetRole(717619391151341599).Mention;
             //}
+            var isOnCooldown = await SqliteClass.IsOnCooldown(Context.User.Id, Context.Guild.Id);
+            if (isOnCooldown)
+            {
+                await ReplyAsync(@"You are on server-set trade cooldown ¯\_(ツ)_/¯");
+                return;
+            }
             bool isTrader;
             (price, isTrader) = await Preprocess(price);
             SocketCommandContext truContext = Context;
@@ -87,6 +93,7 @@ namespace TradeMemer.modules
             var res = await chnl.SendMessageAsync(chn, false, eb.Build());
             await res.AddReactionAsync(new Emoji("✅"));
             await res.AddReactionAsync(new Emoji("❌"));
+            await SqliteClass.AddCooldown(Context.User.Id, Context.Guild.Id);
         }
         [DiscordCommand("trade",
             description ="This is the command for placing an item for sale.",
@@ -101,6 +108,12 @@ namespace TradeMemer.modules
             if (quantity == 0 || item == "")
             {
                 await Context.Channel.SendMessageAsync("", false, tradeError);
+                return;
+            }
+            var isOnCooldown = await SqliteClass.IsOnCooldown(Context.User.Id, Context.Guild.Id);
+            if (isOnCooldown)
+            {
+                await ReplyAsync(@"You are on server-set trade cooldown ¯\_(ツ)_/¯");
                 return;
             }
             bool isTrader;
@@ -127,6 +140,7 @@ namespace TradeMemer.modules
             if (isTrader) await ReplyAsync($"Your sale of {quantity} {item} for {price} currency has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
             else await ReplyAsync($"Your barter of {quantity} {item} for {price} has been mentioned in {chnl.Mention}!\n{await Class4.GetApi(Context as SocketCommandContext)}");
             await Bleh(Context);
+            await SqliteClass.AddCooldown(Context.User.Id, Context.Guild.Id);
         }
         [DiscordCommand("trade")]
         public async Task SingleArgTrade(string help)
@@ -139,6 +153,11 @@ namespace TradeMemer.modules
         {
             await ReplyAsync($"TradePong: ``{ (Context as SocketCommandContext).Client.Latency} ms``");
         }
+        [DiscordCommand("help")]
+        public async Task HelpEr()
+        {
+            await NoArgTrade();
+        }
         [DiscordCommand("trade")]
         public async Task NoArgTrade()
         {
@@ -149,7 +168,7 @@ namespace TradeMemer.modules
             }
         .AddField("Trading Mechanism", $"React with :white_check_mark: to accept a deal and DM the seller.\nAfter a deal is finished, seller should react with :x: to declare the deal as closed.\n\n")
         .AddField("Trading Commands", $"1.``{prefix}trade``\n2.``{prefix}buying``\n\n")
-        .AddField("Non trading commands", $"1.`{prefix}prefix`\n2.`{prefix}idea`\n3.`{prefix}vote`\n4.`{prefix}ping`\n5. `{prefix}patch`\n")
+        .AddField("Non trading commands", $"1.`{prefix}prefix`\n2.`{prefix}idea`\n3.`{prefix}vote`\n4.`{prefix}ping`\n5. `{prefix}patch`\n6.`{prefix}cooldown`")
         .AddField("Secure-trade Commands", $"1.`{prefix}profile`\n2.`{prefix}my-reports`\n3.`{prefix}trade-report`(Admins only)\n4.`{prefix}appeal`\n\n")
         .AddField("Command-Specific Help", $"Specific help can be received by doing `{prefix}help [cmdname]`")
         .AddField("Links", "[Support Server](https://discord.gg/PbunDXN) | [Invite link](https://tiny.cc/TMAdmin) | [GitHub](https://tiny.cc/TMGitHub)")
@@ -198,9 +217,14 @@ namespace TradeMemer.modules
             invite.ImageUrl = Context.Client.CurrentUser.GetAvatarUrl();
             await ReplyAsync("", false, invite.Build());
         }
-        [DiscordCommand("prefix",description ="Change the bot's prefix here!",commandHelp ="prefix &")]
+        [DiscordCommand("prefix",description ="Change the bot's prefix here!",commandHelp ="prefix <prefix>")]
         public async Task PrefixUpd(string x)
         {
+            if (!(Context.User as SocketGuildUser).GuildPermissions.Administrator)
+            {
+                await ReplyAsync(@"You dont have the perms to do so ¯\_(ツ)_/¯");
+                return;
+            }
             await SqliteClass.PrefixAdder(Context.Guild.Id, x);
             EmbedBuilder f = new EmbedBuilder
             {
@@ -266,6 +290,24 @@ namespace TradeMemer.modules
             }
             x.Title = "Patch Information";
             await ReplyAsync("", embed: x.Build());
+        }
+        [DiscordCommand("cooldown",commandHelp ="cooldown <number-of-minutes-in-trade-cooldown>",description ="Sets up a trading cooldown",example ="cooldown 5")]
+        public async Task Cooldown(int mins)
+        {
+            if (!(Context.User as SocketGuildUser).GuildPermissions.Administrator){
+                await ReplyAsync(@"You dont have perms to do so ¯\_(ツ)_/¯");
+                return;
+            }
+            await SqliteClass.EditCoolDOWN(Context.Guild.Id, mins);
+            await ReplyAsync("", false, new EmbedBuilder
+            {
+                Title = "Trading Cooldown Set/Reset!",
+                Description = $"The cooldown is now {mins} minutes!!",
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "NOTE: Existing cooldown users will now be freed from it."
+                }
+            }.Build());
         }
         //Below are supporter functions, not really commands.
         
