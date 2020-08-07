@@ -198,7 +198,7 @@ namespace TradeMemer.modules
             await con.OpenAsync();
             using var cmd = new SqliteCommand();
             cmd.Connection = con;
-            cmd.CommandText = $"replace into prefixes(guildid,Cooldown) values({guildID},{mins});";
+            cmd.CommandText = $"update prefixes set Cooldown = {mins} where guildid = {guildID};";
             await cmd.ExecuteNonQueryAsync();
             cmd.CommandText = $"delete from cooldown where GuildID={guildID}";
             await cmd.ExecuteNonQueryAsync();
