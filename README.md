@@ -1,11 +1,13 @@
 # TradeMemer
+## *Outdated README, however the code is the very current build*
 [![CodeFactor](https://www.codefactor.io/repository/github/djthegr8/tradememer/badge/master?s=b83a252f164eaf3bf8b3c1187799908e7a2072e0)](https://www.codefactor.io/repository/github/djthegr8/tradememer/overview/master)     
 [![Discord Bots](https://top.gg/api/widget/722732239376613406.svg)](https://top.gg/bot/722732239376613406)            
-[![The pic of our bot](https://github.com/djthegr8/TradeMemer/raw/master/TradeMemer/avatar.JPG)](https://bots.ondiscord.xyz/bots/722732239376613406)      
-*The official repository of TradeMemer, a bot that aims to ease trading for all Dank Memer. We <3 open source, so here it is!*
+[![The pic of our bot](https://github.com/djthegr8/TradeMemer/raw/master/TradeMemer/avatar.JPG)](https://top.gg/bot/722732239376613406)      
+*The official repository of TradeMemer, a bot that aims to ease trading for all Dank Memer.              
+We <3 open source, so here it is!*
 Just add a file called token.txt with your token for replication, in the folder printed when you run it.    
 *I have tried to make the code understandable, but as of now it isn't as detailed and commented as it should be...*   
-### [Invite link for Trade Memer](https://bots.ondiscord.xyz/bots/722732239376613406)     
+### [Invite link for Trade Memer](https://top.gg/bot/722732239376613406)     
 *Invite the bot for an awesome trading system!!!*      
 ### [Invite link for support server!](https://discord.gg/6UBr6P2)       
 *This server is up for all people who use and <3 our bot, and also those who have suggestions!!!*
@@ -32,7 +34,7 @@ We aren't at top.gg yet, so we don't really have a voting system, but this gives
 #### 3. !ping
 This simply gives the bot's ping.      
 ### About and Links     
-The bot is made by [DJ001#0915](https://github.com/djthegr8) helped by [IMSlender#0001](https://github.com/deathskull728), and was tested and played around with in the server [DMCG](https://discord.me/dmcg)       
+The bot is made by [DJ001#0915](https://github.com/djthegr8) helped by [SLENDER#0001](https://github.com/deathskull728), and was tested and played around with in the server [DMCG](https://discord.me/dmcg)       
 
 ### License
 We are licensed with Attribution-NonCommercial 3.0 United States, which simply means ~    
