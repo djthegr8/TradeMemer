@@ -62,10 +62,13 @@ namespace TradeMemer.modules
                 await ReplyAsync("That user doesnt exist");
                 return;
             }
-            if (rA.IsBot)
+            if (rA != null)
             {
-                await ReplyAsync("I shall never report my bot friends!");
-                return;
+                if (rA.IsBot)
+                {
+                    await ReplyAsync("I shall never report my bot friends!");
+                    return;
+                }
             }
             string x;
             string y;
