@@ -33,7 +33,7 @@ namespace TradeMemer.modules
                 var readz = await cmd.ExecuteReaderAsync();
                 while (await readz.ReadAsync())
                 {
-                    if (ulong.Parse(readz.GetInt64(0).ToString()) == GuildId && ReporterId != 701029647760097361)
+                    if (ulong.Parse(readz.GetInt64(0).ToString()) == GuildId && ReporterId != 701029647760097361 && ReporterId != 615873008959225856)
                     {
                         return "G";
                     }

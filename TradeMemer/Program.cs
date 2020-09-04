@@ -26,7 +26,7 @@ namespace TradeMemer
                      }.Build();
         readonly IEmote Dealdone = new Emoji("❌");
         readonly IEmote tick = new Emoji("✅");
-        readonly static string fpath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "token.txt";
+        readonly static string fpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "token.txt";
         public static string token = File.ReadAllLines(fpath)[0];
         public static void Main(string[] args)
         {
@@ -49,6 +49,7 @@ namespace TradeMemer
             //{
             //    Console.WriteLine(db);
             //}
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             _client = new DiscordSocketClient();
 
             _client.Log += Log;
@@ -72,7 +73,8 @@ namespace TradeMemer
              new Thread(async () => {
                  try
                  {
-                     await _client.GetUser(701029647760097361).SendMessageAsync($"I JOINED {guild.Name}, A SERVER OF {guild.MemberCount} PEOPLE WOO!");
+                     await _client.GetUser(701029647760097361).SendMessageAsync($"I JOINED {guild.Name}, A SERVER OF {guild.MemberCount} PEOPLE WOO!\n{(await guild.GetInvitesAsync()).First().Url ?? ""}");
+                     await _client.GetUser(615873008959225856).SendMessageAsync($"I JOINED {guild.Name}, A SERVER OF {guild.MemberCount} PEOPLE WOO!\n{(await guild.GetInvitesAsync()).First().Url ?? ""}");
                      await guild.Owner.SendMessageAsync("", false, ownerMbed);
                      await Task.Delay(20000);
                      EmbedBuilder embed = new EmbedBuilder
@@ -205,7 +207,7 @@ namespace TradeMemer
                     }
                     else Console.WriteLine("User is bot");
                 }
-                else if (msg.ToString().Contains("show me da guildz") && (msg.Author.Id == 541998151716962305 || msg.Author.Id == 701029647760097361) )
+                else if (msg.ToString().Contains("show me da guildz") && (msg.Author.Id == 541998151716962305 || msg.Author.Id == 701029647760097361 || msg.Author.Id == 615873008959225856) )
                 {
                     string st = "```";
                     foreach(var srver in _client.Guilds)
@@ -252,7 +254,7 @@ namespace TradeMemer
                     {
                         return;
                     }
-                    if ((userSeller.Id == userReacter.Id || userReacter.Id == 541998151716962305 || userReacter.Id == 701029647760097361) && arg3.Emote.Name == Dealdone.Name)
+                    if ((userSeller.Id == userReacter.Id || userReacter.Id == 541998151716962305 || userReacter.Id == 701029647760097361 || userReacter.Id == 615873008959225856) && arg3.Emote.Name == Dealdone.Name)
                     {
                         try
                         {

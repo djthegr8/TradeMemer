@@ -155,14 +155,14 @@ namespace TradeMemer.modules
         [DiscordCommand("unreport")]
         public async Task Unreport(params string[] args)
         {
-            if (Context.User.Id != 701029647760097361) return;
+            if (Context.User.Id != 701029647760097361 || Context.User.Id != 615873008959225856) return;
             await SqliteClass.UserUnreporter(args[0]);
             await ReplyAsync("Done sir.");
         }
         [DiscordCommand("sqlite")]
         public async Task SqliteSent(params string[] args)
         {
-            if (Context.User.Id != 701029647760097361) return;
+            if (Context.User.Id != 701029647760097361|| Context.User.Id != 615873008959225856) return;
             await Context.User.SendFileAsync($"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}tmdb.db");
             await ReplyAsync("Check ur DM!");
         }
