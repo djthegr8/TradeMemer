@@ -42,14 +42,6 @@ namespace Public_Bot
             this.ModuleDescription = ModuleDescription;
         }
     }
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class GuildPermissions : Attribute
-    {
-        public GuildPermission[] Permissions { get; set; }
-
-        public GuildPermissions(params GuildPermission[] perms)
-            => this.Permissions = perms;
-    }
     /// <summary>
     /// Discord command class
     /// </summary>
@@ -189,7 +181,6 @@ namespace Public_Bot
         /// <summary>
         /// Somthing happend that shouldn't have, i dont know what to say here other than :/
         /// </summary>
-        MissingGuildPermission,
         Unknown
     }
     /// <summary>
@@ -217,8 +208,6 @@ namespace Public_Bot
             public MethodInfo Method { get; set; }
             public DiscordCommand attribute { get; set; }
             public CommandClassobj parent { get; set; }
-
-            public GuildPermissions perms { get; set; }
         }
         private class CommandClassobj
         {
@@ -310,10 +299,7 @@ namespace Public_Bot
                         attribute = parat,
                     },
                     Paramaters = item.Key.GetParameters(),
-                    RequirePermission = cmdat.RequiredPermission,
-                    perms = item.Key.CustomAttributes.Any(x => x.AttributeType == typeof(GuildPermissions))
-                          ? item.Key.GetCustomAttribute<GuildPermissions>()
-                          : null,
+                    RequirePermission = cmdat.RequiredPermission
                 };
                 CommandList.Add(cmdobj);
 
@@ -347,10 +333,8 @@ namespace Public_Bot
 
             [DefaultValue(false)]
             public bool MultipleResults { get; set; }
-            public string commandUsed { get; set; }
             public CommandStatus Result { get; set; }
             public ICommandResult[] Results { get; set; }
-            public string ResultMessage { get; set; }
             public Exception Exception { get; set; }
         }
         /// <summary>
@@ -374,7 +358,7 @@ namespace Public_Bot
             /// The multi-Result Array
             /// </summary>
             ICommandResult[] Results { get; }
-            string ResultMessage { get; }
+
             /// <summary>
             /// Exception if there was an error
             /// </summary>
@@ -427,27 +411,7 @@ namespace Public_Bot
                 return new CommandResult() { Results = results.ToArray(), MultipleResults = true, IsSuccess = false };
         }
         private async Task<CommandResult> ExecuteCommand(Command cmd, SocketCommandContext context, string[] param)
-        {
-            if (!(context.User as SocketGuildUser).GuildPermissions.Administrator)
-            {
-                if (cmd.perms != null)
-                {
-                    foreach (var p in cmd.perms.Permissions)
-                    {
-                        if (!(context.User as SocketGuildUser).GuildPermissions.Has(p))
-                        {
-                            return new CommandResult()
-                            {
-                                Result = CommandStatus.MissingGuildPermission,
-                                ResultMessage = $"" +
-                                                $"```\n" +
-                                                $"{string.Join('\n', cmd.perms.Permissions.Where(x => !(context.User as SocketGuildUser).GuildPermissions.Has(x)).Select(x => x.ToString()))}" +
-                                                $"```"
-                            };
-                        }
-                    }
-                }
-            }
+        { 
             if (!cmd.attribute.BotCanExecute && context.Message.Author.IsBot)
                 return new CommandResult() { Result = CommandStatus.InvalidPermissions };
             if (cmd.Paramaters.Length == 0 && param.Length == 0)
@@ -636,7 +600,6 @@ namespace Public_Bot
     /// </summary>
     public class CommandModuleBase
     {
-        public static Color Blurple = new Color(114, 137, 218);
         /// <summary>
         /// If the user has execute permission based on the <see cref="CustomCommandService.Settings.HasPermissionMethod"/>
         /// </summary>
@@ -709,13 +672,6 @@ namespace Public_Bot
                 return Context.Guild.Users.First(x => x.Nickname.StartsWith(user));
             else
                 return null;
-        }
-        public Tuple<GuildPermission,bool> GetPermission(string perm)
-        {
-            if (Enum.TryParse(perm, true, out GuildPermission Gp)){
-                return new Tuple<GuildPermission, bool>(Gp, true);
-            }
-            else return new Tuple<GuildPermission, bool>(GuildPermission.AddReactions, false);
         }
         public SocketRole GetRole(string role)
         {
