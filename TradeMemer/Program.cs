@@ -61,13 +61,16 @@ namespace TradeMemer
             _client.JoinedGuild += HandleJoinAsync;
 
             _client.LatencyUpdated += StatusUpdateAsync;
-            Console.WriteLine(fpath);
+            //Console.WriteLine(fpath);
             
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
+            
             await _client.SetGameAsync("!trade help",null,ActivityType.Playing);
+            //await _client.StopAsync();
             await Task.Delay(-1);
         }
+
         internal async Task HandleJoinAsync(SocketGuild guild) {
             await Task.Delay(10);
              new Thread(async () => {
